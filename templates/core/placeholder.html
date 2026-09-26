@@ -1,0 +1,4 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ heading }} · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page app-page"><p class="eyebrow">食尽其用</p><h1>{{ heading }}</h1><p class="empty-state">{{ detail }}</p><p>当前页面没有推荐、采购记录或统计。</p></main>{% include 'core/nav.html' with active_tab=active_tab %}</body></html>

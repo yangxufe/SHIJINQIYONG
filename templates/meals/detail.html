@@ -1,0 +1,91 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ recipe.name }} · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<main class="page app-page recipe-detail-page">
+  <p class="eyebrow"><a href="{% url 'recipes_page' %}">做什么</a> / 菜谱</p>
+  <h1>{{ recipe.name }}</h1>
+  <p class="recipe-meta">{{ recipe.category }} · {{ recipe.source_label }}{% for tag in recipe.tags %} · #{{ tag }}{% endfor %}</p>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% if error %}<p class="error" role="alert">{{ error }}。请核对批次和数量；若结果不确定，请保留当前请求编号重试。</p>{% endif %}
+  {% if recipe.is_family %}<p><a href="{% url 'recipe_edit' recipe.id %}">编辑名称、食材、分类和教程</a></p>{% endif %}
+  {% if recipe.structured %}<section class="panel" aria-labelledby="structured-tutorial"><h2 id="structured-tutorial">按 {{ recipe.structured.servings }} 人份编写的详细参考教程</h2>
+    <p>{{ recipe.structured.cuisine }} · {{ recipe.structured.difficulty }} · 辣度 {{ recipe.structured.spice_level }}/5 · 备料 {{ recipe.structured.prep_minutes }} 分钟 · 操作 {{ recipe.structured.active_minutes }} 分钟 · 等待 {{ recipe.structured.wait_minutes }} 分钟 · 预计总计 {{ recipe.structured.total_minutes }} 分钟</p>
+    <p class="small-note">{{ recipe.structured.source_label }}。这是参考量，修改人数后请到菜谱工作台重新计算；不代表已做过或已通过食品安全检查。</p>
+    <h3>材料与用量</h3><ul>{% for item in recipe.structured.ingredients %}<li>{{ item.name }} {{ item.quantity }} {{ item.unit }} · {{ item.role }} · {{ item.food_state }}</li>{% endfor %}</ul>
+    <h3>器材</h3><p>{{ recipe.structured.equipment|join:'、' }}</p>
+    <h3>备料</h3><ul>{% for item in recipe.structured.preparations %}<li>{{ item.name }}：{{ item.action }}</li>{% endfor %}</ul>
+    <h3>分步烹饪</h3><ol>{% for step in recipe.structured.steps %}<li><strong>{{ step.equipment }} · {{ step.heat }} · {{ step.minutes_min }}–{{ step.minutes_max }} 分钟</strong><br>{{ step.action }}<br>进入下一步：{{ step.done_when }}<br>注意：{{ step.tip }}</li>{% endfor %}</ol>
+    {% if recipe.safety_notes %}<h3>中心温度核验</h3>{% for note in recipe.safety_notes %}<p>{{ note.text }} <a href="{{ note.source }}" rel="noopener noreferrer" target="_blank">查看 USDA FSIS 原始规则</a></p>{% endfor %}<p class="small-note">时间、外观和灶具火力不能代替中心温度；疑似变质的食材不能靠加热挽救。</p>{% endif %}
+  </section>{% else %}<p class="notice">此菜谱尚无可核算的材料用量和完整教程；在工作台不会被标成严格库存匹配。</p>{% endif %}
+  <section class="panel" aria-labelledby="recipe-steps">
+    <h2 id="recipe-steps">做法参考</h2>
+    {% if recipe.steps %}<ol class="recipe-steps">{% for step in recipe.steps %}<li>{{ step }}</li>{% endfor %}</ol>
+    {% else %}<p>暂未录入文字步骤，可补充做法，或查看下方的家庭视频与图片。</p>{% endif %}
+    {% if recipe.source_url %}<p><a href="{{ recipe.source_url }}" target="_blank" rel="noopener noreferrer">打开原教程网站</a></p>{% endif %}
+    {% if recipe.source_note %}<p class="recipe-note">{{ recipe.source_note }}</p>{% endif %}
+  </section>
+  {% if recipe.is_family %}
+  <section class="panel" aria-labelledby="recipe-media-heading">
+    <h2 id="recipe-media-heading">家庭上传的图片和视频</h2>
+    <p class="small-note">文件只保存在本机私有目录，必须登录家庭账号才能打开。每道菜最多 6 张图片、1 个视频；单个视频最多 200 MB。MOV 在部分手机上可能无法播放。</p>
+    {% for item in media_items %}
+    <div class="recipe-media-item">
+      {% if item.kind == 'image' %}<img src="{% url 'recipe_media_file' recipe.id item.id %}" alt="{{ item.caption|default:'菜谱图片' }}" loading="lazy">
+      {% else %}<video controls playsinline preload="metadata"><source src="{% url 'recipe_media_file' recipe.id item.id %}" type="{{ item.mime_type }}">当前浏览器不能播放此视频。</video>{% endif %}
+      {% if item.caption %}<p>{{ item.caption }}</p>{% endif %}
+      <form method="post" action="{% url 'recipe_media_delete' recipe.id item.id %}">{% csrf_token %}<button type="submit" class="secondary-button">删除这份附件</button></form>
+    </div>
+    {% empty %}<p class="small-note">还没有上传的图片或视频。</p>{% endfor %}
+    {% if upload_error %}<p class="error" role="alert">{{ upload_error }}。请核对文件；不确定是否保存时，用原上传编号和原文件重试。</p>{% endif %}
+    <form method="post" action="{% url 'recipe_upload' recipe.id %}" enctype="multipart/form-data" class="recipe-upload-form" data-recipe-upload>
+      {% csrf_token %}<input type="hidden" name="request_id" value="{{ upload_request_id }}">
+      <label for="upload-kind">文件类型</label><select id="upload-kind" name="kind"><option value="image">图片</option><option value="video">视频</option></select>
+      <label for="upload-file">选择本机文件</label><input id="upload-file" type="file" name="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" required>
+      <label for="upload-caption">说明（可选）</label><input id="upload-caption" name="caption" maxlength="80">
+      <button type="submit">上传到家庭菜谱</button>
+      <p class="small-note" role="status" data-upload-status></p>
+    </form>
+  </section>
+  {% endif %}
+  <section aria-labelledby="recipe-lots">
+    <h2 id="recipe-lots">核对实际用量</h2>
+    <p class="small-note">选择菜谱不会扣库存。每种食材至少填写一个批次的本次实际用量，单位按批次显示；确认后才会扣减并记录流水。</p>
+    {% if recipe.has_all %}
+    <form method="post" action="{% url 'recipe_cook' recipe.id %}">
+      {% csrf_token %}<input type="hidden" name="request_id" value="{{ request_id }}">
+      {% if recipe.is_family %}<input type="hidden" name="recipe_version" value="{{ recipe.version }}">{% endif %}
+      {% for ingredient in recipe.ingredients %}
+      <fieldset class="panel recipe-ingredient">
+        <legend>{{ ingredient.name }}</legend>
+        {% for lot in ingredient.lots %}
+        <label for="use-{{ lot.id }}">{{ lot.name }} · 库存 {{ lot.quantity }} {{ lot.unit_label }} · {{ lot.location_label }}
+          <input id="use-{{ lot.id }}" name="quantity_{{ lot.id }}" inputmode="decimal" maxlength="16" value="{{ lot.quantity_value }}" placeholder="本次用量（{{ lot.unit_label }}）">
+        </label>
+        <input type="hidden" name="version_{{ lot.id }}" value="{{ lot.version_value }}">
+        {% endfor %}
+      </fieldset>
+      {% endfor %}
+      <button type="submit">确认实际用量并扣库存</button>
+    </form>
+    {% else %}
+      {% for ingredient in recipe.ingredients %}
+      <div class="panel recipe-ingredient"><h3>{{ ingredient.name }}</h3>
+        {% if ingredient.lots %}<p>已找到 {{ ingredient.lots|length }} 个可用批次。</p>
+        {% else %}<p>暂无可用批次，请到<a href="{% url 'inventory_page' %}">冰箱</a>核对或录入。</p>{% endif %}
+      </div>
+      {% endfor %}
+    {% endif %}
+  </section>
+  <p class="small-note">菜谱只供做饭参考，不表示食材一定安全；疑似变质、储存待核对和包装日期已过的批次不会用于匹配或扣减。</p>
+</main>
+{% include 'core/nav.html' with active_tab='recipes' %}
+{% if recipe.is_family %}<script type="module" src="{% static 'js/recipe-upload.js' %}"></script>{% endif %}
+</body>
+</html>

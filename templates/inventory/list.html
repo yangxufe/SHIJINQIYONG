@@ -1,0 +1,97 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>冰箱与批次 · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<main class="page inventory-page app-page" id="inventory-page" data-list-url="{% url 'inventory_api' %}" data-action-url="{% url 'actions_api' %}">
+  <p class="eyebrow"><a href="{% url 'index' %}">食尽其用</a> / 冰箱</p>
+  <h1>食材批次</h1>
+  <p>每次实际使用或丢弃后再确认数量。储存待核对、疑似变质或包装日期已过的批次不能记为可用食材。</p>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% if error %}<p class="error" role="alert">{{ error }}。请核对输入后重试；如请求超时，请保留原编号核对结果。</p>{% endif %}
+
+  <section aria-labelledby="new-lot-heading" class="panel">
+    <h2 id="new-lot-heading">放进冰箱</h2>
+    <form method="post" action="{% url 'inventory_page' %}" data-inventory-form data-api-url="{% url 'inventory_api' %}" data-api-method="POST" data-inventory-kind="create" data-photo-url="{% url 'inventory_recognize_api' %}">
+      {% csrf_token %}<input type="hidden" name="request_id" value="{{ new_request_id }}">
+      <div class="photo-area">
+        <label for="food-photo">拍照识别食材或包装</label>
+        <input id="food-photo" type="file" accept="image/*" capture="environment" aria-describedby="photo-help">
+        <p id="photo-help" class="small-note">一次拍一种食材，尽量拍清楚实物或包装文字。只在本机识别；请核对名称后保存。</p>
+        <span id="photo-state" class="submit-state" role="status" aria-live="polite"></span>
+      </div>
+      <div class="fields">
+        <label>食材名称 <input name="ingredient_name" value="{{ draft.ingredient_name|default:'' }}" maxlength="80" required autocomplete="off"></label>
+        <label>数量 <input name="quantity" inputmode="decimal" value="{{ draft.quantity|default:'' }}" maxlength="16" required></label>
+        <label>单位 <select name="unit"><option value="piece" {% if draft.unit == 'piece' %}selected{% endif %}>个</option><option value="g" {% if draft.unit == 'g' %}selected{% endif %}>克</option><option value="kg" {% if draft.unit == 'kg' %}selected{% endif %}>千克</option><option value="ml" {% if draft.unit == 'ml' %}selected{% endif %}>毫升</option><option value="l" {% if draft.unit == 'l' %}selected{% endif %}>升</option><option value="pack" {% if draft.unit == 'pack' %}selected{% endif %}>包</option></select></label>
+        <label>位置 <select name="location"><option value="fridge" {% if draft.location == 'fridge' %}selected{% endif %}>冷藏</option><option value="freezer" {% if draft.location == 'freezer' %}selected{% endif %}>冷冻</option><option value="pantry" {% if draft.location == 'pantry' %}selected{% endif %}>常温</option><option value="other" {% if draft.location == 'other' %}selected{% endif %}>其他</option></select></label>
+        <label>食材状态 <select name="status"><option value="active" {% if draft.status == 'active' %}selected{% endif %}>在库</option><option value="suspect" {% if draft.status == 'suspect' %}selected{% endif %}>疑似变质</option></select></label>
+        <label>储存状况 <select name="storage_status"><option value="needs_check" {% if draft.storage_status == 'needs_check' %}selected{% endif %}>待核对</option><option value="verified" {% if draft.storage_status == 'verified' %}selected{% endif %}>已核对</option></select></label>
+      </div>
+      <details class="advanced-fields">
+        <summary>更多信息（日期、批次名、优先顺序）</summary>
+        <div class="fields">
+        <label>批次名称（可留空） <input name="name" value="{{ draft.name|default:'' }}" maxlength="80"></label>
+        <label>计划使用日期 <input type="date" name="planned_use_date" value="{{ draft.planned_use_date|default:'' }}"></label>
+        <label>包装日期状态 <select name="package_date_status"><option value="unknown" {% if draft.package_date_status == 'unknown' %}selected{% endif %}>未记录</option><option value="known" {% if draft.package_date_status == 'known' %}selected{% endif %}>已记录</option><option value="not_applicable" {% if draft.package_date_status == 'not_applicable' %}selected{% endif %}>不适用</option></select></label>
+        <label>包装日期 <input type="date" name="package_date" value="{{ draft.package_date|default:'' }}"></label>
+        <label>包装日期原文 <input name="package_date_text" value="{{ draft.package_date_text|default:'' }}" maxlength="80"></label>
+        <label>采购日期 <input type="date" name="purchase_date" value="{{ draft.purchase_date|default:'' }}"></label>
+        <label>开封日期 <input type="date" name="opened_date" value="{{ draft.opened_date|default:'' }}"></label>
+        <label>手动优先 <select name="manual_priority"><option value="false" {% if draft.manual_priority != 'true' %}selected{% endif %}>普通安排</option><option value="true" {% if draft.manual_priority == 'true' %}selected{% endif %}>优先安排</option></select></label>
+        </div>
+      </details>
+      <p class="small-note">数量最多三位小数。照片无法判断数量、日期或食物是否安全；储存状况默认待核对，不会进入可用推荐。包装有日期时请在“更多信息”中如实填写。</p>
+      <button type="submit">保存批次</button><span class="submit-state" role="status" aria-live="polite"></span>
+    </form>
+  </section>
+
+  <section aria-labelledby="lots-heading">
+    <h2 id="lots-heading">批次列表（<span id="lots-count">{{ page.count }}</span>）</h2>
+    <form method="get" action="{% url 'inventory_page' %}" role="search" class="search-form" id="inventory-search">
+      <label for="inventory-query">搜索食材或批次</label>
+      <div class="search-row"><input id="inventory-query" name="q" value="{{ search_query }}" maxlength="80" autocomplete="off"><button type="submit" class="secondary-button">搜索</button></div>
+      <span id="search-state" class="submit-state" role="status" aria-live="polite"></span>
+    </form>
+    <div id="lots-list">
+    {% for lot in page.items %}
+    <article class="panel lot-card" id="lot-{{ lot.id }}" data-lot-id="{{ lot.id }}">
+      <h3>{{ lot.name }}</h3>
+      <p><strong>{{ lot.quantity }} {{ lot.unit_label }}</strong> · {{ lot.location_label }} · {{ lot.status_label }} · 储存：{{ lot.storage_status_label }}</p>
+      <p class="small-note">食材：{{ lot.ingredient_name }}；{% if lot.manual_priority %}手动优先；{% endif %}计划：{{ lot.planned_use_date|default:'未记录' }}；包装日期：{{ lot.package_date|default:lot.package_date_status_label }}；版本 {{ lot.version }}；更新 {{ lot.updated_at_label }}</p>
+      {% if lot.status == 'active' or lot.status == 'suspect' %}
+      <p><a href="{% url 'inventory_edit_page' lot.id %}">编辑批次信息</a></p>
+      <form method="post" action="{% url 'inventory_action_form' %}" data-inventory-form data-api-url="{% url 'actions_api' %}" data-api-method="POST" data-inventory-kind="action">
+        {% csrf_token %}
+        <input type="hidden" name="request_id" value="{{ lot.form_request_id }}">
+        <input type="hidden" name="lot_id" value="{{ lot.id }}">
+        <input type="hidden" name="version" value="{{ lot.version }}">
+        <input type="hidden" name="unit" value="{{ lot.unit }}">
+        <div class="fields">
+          <label>记录类型 <select name="kind"><option value="cook">用于做饭</option><option value="eat">直接食用</option><option value="discard">真实丢弃</option><option value="correct">校正库存</option></select></label>
+          <label>本次数量／校正后余额 <input name="quantity" inputmode="decimal" maxlength="16" required></label>
+          <label>说明（校正必填） <input name="note" maxlength="200"></label>
+        </div>
+        <p class="small-note">“校正库存”填写新的剩余量；其他类型填写本次用量。提交后才会扣减并记录流水。</p>
+        <button type="submit">确认记录</button><span class="submit-state" role="status" aria-live="polite"></span>
+      </form>
+      {% endif %}
+    </article>
+    {% empty %}<p class="note">{% if search_query %}没有匹配的批次。{% else %}还没有批次记录。先录入最容易忘记的 5 样即可。{% endif %}</p>{% endfor %}
+    </div>
+    <nav class="pagination" aria-label="批次分页">
+      {% if page.page > 1 %}<a href="?q={{ search_query|urlencode }}&amp;page={{ page.page|add:'-1' }}">上一页</a>{% endif %}
+      <span id="pagination-status">第 {{ page.page }} / {{ page.pages }} 页</span>
+      {% if page.page < page.pages %}<a href="?q={{ search_query|urlencode }}&amp;page={{ page.page|add:'1' }}">下一页</a>{% endif %}
+    </nav>
+  </section>
+</main>
+{% include 'core/nav.html' with active_tab='inventory' %}
+<script type="module" src="{% static 'js/inventory.js' %}"></script>
+</body>
+</html>

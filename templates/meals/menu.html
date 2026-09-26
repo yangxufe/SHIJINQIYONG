@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>选定菜单 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page app-page"><p class="eyebrow"><a href="{% url 'workbench_results' menu.recipe_request.id %}">候选菜谱</a> / 选定菜单</p><h1>本餐菜单</h1>
+  <section class="panel"><h2>共同使用一份库存</h2><p>{% for spec in selected %}{{ spec.title }}{% if not forloop.last %}、{% endif %}{% endfor %} · {{ conditions.people }} 人</p>
+    {% if menu.executed_action_id %}<p class="small-note">下列覆盖与缺口按执行后的当前库存重算，不能当作执行前的分配记录；实际流水见冰箱。</p>{% endif %}
+    {% if result.blockers %}{% for blocker in result.blockers %}<p class="error">{{ blocker }}</p>{% endfor %}{% endif %}
+    {% if participants_need_manual_check %}<p class="notice">有同餐成员未授权共享过敏或禁食限制；实际制作前请向本人核对。</p>{% endif %}
+    {% if result.feasible %}<p class="notice">当前核对可行；实际使用前仍须确认真实用量并重新检查批次版本与状态。</p>{% else %}<p class="error">当前菜单不满足硬条件或严格库存，不能直接执行。</p>{% endif %}
+    {% for allocation in result.allocations %}<p>{{ allocation.ingredient }}：批次 #{{ allocation.lot_id }} 预计用 {{ allocation.quantity }} {{ allocation.unit }}，剩 {{ allocation.remaining }} {{ allocation.unit }}</p>{% endfor %}
+    {% for gap in result.gaps %}<p>理论净缺口：{{ gap.ingredient }} {{ gap.quantity }} {{ gap.unit }}；包装规格未知，不提供虚构购买量。</p>{% endfor %}
+    {% if result.priority_unused %}<p class="small-note">仍未安排的优先食材：{{ result.priority_unused|join:'、' }}</p>{% endif %}
+  </section>
+  {% if selected|length > 1 %}<section class="panel"><h2>多菜顺序</h2>
+    <p class="small-note">保守安排为逐道完成，不安排同一人或同一锅同时操作；以下是按各菜预计耗时排出的参考顺序，并非保证的完成时间。</p>
+    <ol>{% for row in schedule %}<li>第 {{ row.start }}–{{ row.end }} 分钟：{{ row.title }}（{{ row.equipment }}）。先完成该菜的备料，再按详情步骤操作。</li>{% endfor %}</ol>
+    <p>逐道制作参考约 {{ sequential_minutes }} 分钟。有独立器材时可在蒸制等待期间准备下一道菜，但不要让同一锅或需要看护的步骤冲突；实际总时长需按具体步骤与锅具容量调整。</p>
+  </section>{% endif %}
+  <section class="panel"><h2>{% if menu.executed_action_id %}按实际流水重算的营养估算{% else %}计划营养估算{% endif %}</h2>
+    {% if menu.executed_action_id %}<p>整餐蛋白质：{{ menu.actual_nutrition.whole.protein_g|default:'未知/未核算' }} g；每人碳水：{{ menu.actual_nutrition.per_person.carbohydrate_g|default:'未知/未核算' }} g。</p>
+      {% for row in menu.actual_uses %}<p class="small-note">实际批次 #{{ row.lot_id }}：{{ row.change }} {{ row.unit }}，剩 {{ row.after }} {{ row.unit }}</p>{% endfor %}
+    {% else %}<p>整餐蛋白质：{{ result.nutrition.whole.protein_g|default:'未知/未核算' }} g；每人碳水：{{ result.nutrition.per_person.carbohydrate_g|default:'未知/未核算' }} g。</p>{% endif %}
+    <p class="small-note">未知营养字段不会按零处理；一般饮食规划，不作诊断或治疗承诺。</p></section>
+  {% if menu.executed_action_id %}<section class="panel"><p class="notice">本餐已确认实际使用，库存流水动作 #{{ menu.executed_action_id }}。再次做这餐请建立新的菜单。</p></section>{% endif %}
+  {% if not menu.executed_action_id and conditions.stock_mode == 'buy' and purchase_gaps %}<section class="panel"><h2>确认加入采购</h2>
+    <p class="small-note">只处理这次选定菜单的净缺口。已有待购项会提示核对；买到并不等于入库。</p>
+    <form method="post" action="{% url 'menu_add_shopping' menu.id %}">{% csrf_token %}<input type="hidden" name="snapshot" value="{{ snapshot }}">
+      {% for gap in purchase_gaps %}<label class="form-row"><input type="checkbox" name="gap" value="{{ gap.key }}" {% if gap.name in existing_contributions %}disabled{% endif %}> {{ gap.name }}：理论净缺口 {{ gap.quantity }} {{ gap.unit }}{% if gap.name in existing_contributions %}（本菜单已加入）{% endif %}</label>
+        {% if gap.name not in existing_contributions %}<label class="form-row">本次计划购买 {{ gap.name }}（{{ gap.unit }}，可调整）<input type="number" name="buy_{{ gap.key }}" value="{{ gap.quantity }}" min="0.001" step="0.001" required></label>{% endif %}{% endfor %}
+      <label class="form-row"><input type="checkbox" name="confirm_duplicate"> 我已核对现有库存及待购项，仍需要所选净缺口</label>
+      <button type="submit">确认加入所选缺料</button>
+    </form></section>{% endif %}
+  {% if not menu.executed_action_id and result.feasible and not result.gaps and cook_lots %}<section class="panel"><h2>确认实际使用</h2>
+    <p class="small-note">请按真实用量修改。提交时会重新检查批次状态、数量和版本，并写入库存流水；若用量不同，上方营养估算须重新核算。</p>
+    <form method="post" action="{% url 'menu_cook' menu.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ request_id }}"><input type="hidden" name="snapshot" value="{{ snapshot }}">
+      {% for lot in cook_lots %}<label class="form-row">{{ lot.names }} · 批次 #{{ lot.lot_id }}（{{ lot.unit }}）<input name="actual_{{ lot.lot_id }}" type="number" min="0.001" step="0.001" required value="{{ lot.quantity }}"></label>{% endfor %}
+      {% if participants_need_manual_check %}<label class="form-row"><input type="checkbox" name="confirm_restrictions" required> 我已向同餐成员核对过敏与禁食限制</label>{% endif %}
+      <label class="form-row"><input type="checkbox" name="confirm_use" required> 我已核对这些批次和实际用量，确认扣库存</label>
+      <button type="submit">确认实际使用并记录流水</button>
+    </form></section>{% endif %}
+  <p class="small-note">仅打开本页不会更改冰箱或清单。</p>
+</main>{% include 'core/nav.html' with active_tab='recipes' %}</body></html>

@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>候选菜谱 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page app-page">
+  <p class="eyebrow"><a href="{% url 'workbench_page' %}">菜谱工作台</a> / 候选</p><h1>符合条件的候选</h1>
+  <section class="panel"><h2>已确认的条件</h2><p>{{ conditions.people }} 人 · {% if conditions.stock_mode == 'strict' %}严格只用现有食材{% else %}允许补购{% endif %} · 最多 {{ conditions.max_minutes }} 分钟 · 辣度上限 {{ conditions.spice_max }}</p>
+    <p class="small-note">营养方向：{{ conditions.goals|join:'、'|default:'未设置' }}。模型不会把“健身”改写成减脂目标。</p>
+    {% if inventory_changed %}<p class="notice">冰箱已变化；以下分配按当前库存重新计算，选定菜单和实际使用时还会复核。</p>{% endif %}
+    {% if participants_need_manual_check %}<p class="notice">部分同餐成员没有授权共享限制。请向本人核对过敏和禁食要求，再决定是否制作；系统不会读取其私人配置。</p>{% endif %}
+  </section>
+  <form method="post" action="{% url 'workbench_menu_create' plan.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ menu_request_id }}">
+    {% for row in candidates %}<article class="panel recipe-card">
+      <h2>{{ row.spec.title }}</h2><p>{{ row.spec.cuisine }} · {{ row.spec.source_label }} · {{ row.spec.total_minutes }} 分钟 · {{ row.spec.servings }} 人份基准</p>
+      <p>{% for reason in row.match.reasons %}{{ reason }}。{% endfor %}</p>
+      {% for allocation in row.match.allocations %}<p class="small-note">{{ allocation.ingredient }}：批次 #{{ allocation.lot_id }} 用 {{ allocation.quantity }} {{ allocation.unit }}，预计剩 {{ allocation.remaining }} {{ allocation.unit }}</p>{% endfor %}
+      {% for gap in row.match.gaps %}<p class="small-note">净缺口：{{ gap.ingredient }} {{ gap.quantity }} {{ gap.unit }}；包装购买量未知</p>{% endfor %}
+      <p class="small-note">每人蛋白质：{{ row.match.nutrition.per_person.protein_g|default:'未知/未核算' }} g；每人碳水：{{ row.match.nutrition.per_person.carbohydrate_g|default:'未知/未核算' }} g。营养为一般估算，不作治疗建议。</p>
+      <p><a href="{% url 'recipe_detail' row.spec.id %}">查看完整教程</a></p>
+      <label><input type="checkbox" name="recipe_id" value="{{ row.spec.id }}"> 选入菜单</label>
+    </article>{% empty %}<p class="empty-state">当前硬条件和真实库存下没有可行的结构化菜谱。可修改人数、器材或食材模式后重新确认；过敏和禁食不会自动放宽。</p>{% endfor %}
+    {% if candidates %}<button type="submit">统一核对选定菜单</button>{% endif %}
+  </form>
+  {% if candidates %}<section class="panel"><h2>记录真实口味反馈</h2><p class="small-note">反馈只归当前账号，不会因浏览一次就改写长期口味。</p>
+    {% for row in candidates %}<form method="post" action="{% url 'recipe_feedback' plan.id row.spec.id %}">{% csrf_token %}<label>{{ row.spec.title }}
+      <select name="verdict"><option value="like">喜欢</option><option value="dislike">不喜欢</option><option value="too_spicy">太辣</option><option value="too_sweet">太甜</option><option value="too_complex">太复杂</option><option value="make_again">愿意再做</option><option value="clear">清除反馈</option></select></label><button type="submit" class="secondary-button">保存</button></form>{% endfor %}
+  </section>{% endif %}
+  {% if unquantified %}<section class="panel"><h2>用量待补的家庭菜谱</h2><p class="small-note">这些旧菜谱仍可查看，但没有可靠材料用量，不能声称严格匹配或计算缺口。</p>{% for recipe in unquantified %}<p><a href="{% url 'recipe_detail' recipe.id %}">{{ recipe.title }}</a></p>{% endfor %}</section>{% endif %}
+  <section class="panel"><h2>可选生成新菜谱</h2>
+    {% if configured_provider %}<p class="small-note">模型提供者：{{ configured_provider }}。仅发送本次确认条件及可用食材名称与数量；不发送账号、Cookie、家庭备注或完整数据库。生成过程异步进行，模型结果必须再经过服务端校验。</p>
+      <form method="post" action="{% url 'generation_submit' plan.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ generation_request_id }}">
+        {% if configured_provider == 'openai' %}<label><input type="checkbox" name="external_consent" required> 我同意把上述必要数据发送给管理员配置的外部模型</label>{% endif %}
+        <button type="submit">生成一个候选</button>
+      </form>
+    {% else %}<p>模型未配置；当前显示的是本地真实库存匹配，没有冒充 AI 生成。</p>{% endif %}
+  </section>
+  <p><a href="{% url 'personal_taste' %}">编辑个人口味与限制</a></p>
+</main>{% include 'core/nav.html' with active_tab='recipes' %}</body></html>

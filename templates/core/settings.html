@@ -1,0 +1,19 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>家庭设置 · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">食尽其用</p>
+    <h1>家庭设置</h1>
+    <p>设置数据表已建立。配置操作将在后续阶段开放。</p>
+    <p><a href="{% url 'index' %}">返回首页</a></p>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">退出登录</button></form>
+  </main>
+</body>
+</html>

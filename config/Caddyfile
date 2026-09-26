@@ -1,0 +1,74 @@
+{
+	admin off
+	persist_config off
+	auto_https disable_redirects
+	skip_install_trust
+	storage file_system C:/ProgramData/ShiJinQiYong/CaddyData
+}
+
+https://192.168.110.146:8443 {
+	bind 192.168.110.146
+	tls internal
+
+	handle_path /static/* {
+		request_body {
+			max_size 64KB
+		}
+		root * C:/ProgramData/ShiJinQiYong/static
+		encode zstd gzip
+		header X-Content-Type-Options nosniff
+		@fingerprinted path_regexp fingerprinted \.[0-9a-f]{12}\.[^.]+$
+		handle @fingerprinted {
+			header Cache-Control "public, max-age=31536000, immutable"
+			file_server
+		}
+		handle {
+			header Cache-Control no-store
+			file_server
+		}
+	}
+
+	@photo path /api/inventory/recognize/
+	handle @photo {
+		request_body {
+			max_size 4MB
+		}
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up -Forwarded
+			header_up -X-Forwarded-Host
+			header_up -X-Forwarded-Port
+			header_up -X-Forwarded-By
+		}
+	}
+
+	@recipeUpload path /recipes/family-*/upload/
+	handle @recipeUpload {
+		request_body {
+			max_size 220MB
+		}
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up -Forwarded
+			header_up -X-Forwarded-Host
+			header_up -X-Forwarded-Port
+			header_up -X-Forwarded-By
+		}
+	}
+
+	handle {
+		request_body {
+			max_size 64KB
+		}
+		reverse_proxy 127.0.0.1:8000 {
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+			header_up -Forwarded
+			header_up -X-Forwarded-Host
+			header_up -X-Forwarded-Port
+			header_up -X-Forwarded-By
+		}
+	}
+}

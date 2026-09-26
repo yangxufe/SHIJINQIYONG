@@ -1,0 +1,24 @@
+{% load static %}
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>编辑批次 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head><body>
+<main class="page inventory-page app-page">
+  <p><a href="{% url 'inventory_page' %}">返回批次</a></p><h1>编辑批次信息</h1>
+  <p>数量、单位和食材标识不能在此修改。数量变化请使用“用掉”“丢弃”或“校正库存”。</p>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="{% url 'inventory_edit_page' lot_id %}" class="panel" data-inventory-form data-api-url="{% url 'inventory_detail_api' lot_id %}" data-api-method="PATCH" data-inventory-kind="edit">
+    {% csrf_token %}<input type="hidden" name="request_id" value="{{ draft.request_id }}"><input type="hidden" name="version" value="{{ draft.version }}">
+    <div class="fields">
+      <label>批次名称 <input name="name" value="{{ draft.name }}" maxlength="80" required></label>
+      <label>位置 <select name="location"><option value="fridge" {% if draft.location == 'fridge' %}selected{% endif %}>冷藏</option><option value="freezer" {% if draft.location == 'freezer' %}selected{% endif %}>冷冻</option><option value="pantry" {% if draft.location == 'pantry' %}selected{% endif %}>常温</option><option value="other" {% if draft.location == 'other' %}selected{% endif %}>其他</option></select></label>
+      <label>计划使用日期 <input type="date" name="planned_use_date" value="{{ draft.planned_use_date|default:'' }}"></label>
+      <label>包装日期状态 <select name="package_date_status"><option value="unknown" {% if draft.package_date_status == 'unknown' %}selected{% endif %}>未记录</option><option value="known" {% if draft.package_date_status == 'known' %}selected{% endif %}>已记录</option><option value="not_applicable" {% if draft.package_date_status == 'not_applicable' %}selected{% endif %}>不适用</option></select></label>
+      <label>包装日期 <input type="date" name="package_date" value="{{ draft.package_date|default:'' }}"></label>
+      <label>包装日期原文 <input name="package_date_text" value="{{ draft.package_date_text|default:'' }}" maxlength="80"></label>
+      <label>采购日期 <input type="date" name="purchase_date" value="{{ draft.purchase_date|default:'' }}"></label>
+      <label>开封日期 <input type="date" name="opened_date" value="{{ draft.opened_date|default:'' }}"></label>
+      <label>食材状态 <select name="status"><option value="active" {% if draft.status == 'active' %}selected{% endif %}>在库</option><option value="suspect" {% if draft.status == 'suspect' %}selected{% endif %}>疑似变质</option></select></label>
+      <label>储存状况 <select name="storage_status"><option value="needs_check" {% if draft.storage_status == 'needs_check' %}selected{% endif %}>待核对</option><option value="verified" {% if draft.storage_status == 'verified' %}selected{% endif %}>已核对</option></select></label>
+      <label>手动优先 <select name="manual_priority"><option value="false" {% if not draft.manual_priority or draft.manual_priority == 'false' %}selected{% endif %}>普通安排</option><option value="true" {% if draft.manual_priority == True or draft.manual_priority == 'true' %}selected{% endif %}>优先安排</option></select></label>
+    </div>
+    <button type="submit">保存修改</button><span class="submit-state" role="status" aria-live="polite"></span>
+  </form>
+</main>{% include 'core/nav.html' with active_tab='inventory' %}<script type="module" src="{% static 'js/inventory.js' %}"></script></body></html>

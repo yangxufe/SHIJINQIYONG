@@ -1,0 +1,6 @@
+<nav class="bottom-nav" aria-label="主要页面">
+  <a href="{% url 'index' %}" {% if active_tab == 'today' %}aria-current="page"{% endif %}>今天</a>
+  <a href="{% url 'inventory_page' %}" {% if active_tab == 'inventory' %}aria-current="page"{% endif %}>冰箱</a>
+  <a href="{% url 'recipes_page' %}" {% if active_tab == 'recipes' %}aria-current="page"{% endif %}>做什么</a>
+  <a href="{% url 'shopping_page' %}" {% if active_tab == 'shopping' %}aria-current="page"{% endif %}>采购</a>
+</nav>

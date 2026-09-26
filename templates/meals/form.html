@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<main class="page app-page recipe-form-page">
+  <p class="eyebrow"><a href="{% url 'recipes_page' %}">做什么</a> / 家庭菜谱</p>
+  <h1>{{ page_title }}</h1>
+  <p class="small-note">填写主要食材便于按冰箱现有批次匹配。保存的菜谱、笔记和上传文件仅供本家庭登录成员查看；外部教程链接仍指向原网站。</p>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  {% if form.non_field_errors %}<div class="error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  <form method="post" action="{% if recipe %}{% url 'recipe_edit' recipe_id %}{% else %}{% url 'recipe_new' %}{% endif %}" class="panel recipe-form">
+    {% csrf_token %}{{ form.request_id }}{{ form.version }}
+    <div class="fields">
+      <div><label for="{{ form.title.id_for_label }}">菜谱名称</label>{{ form.title }}{{ form.title.errors }}</div>
+      <div><label for="{{ form.category.id_for_label }}">分类</label>{{ form.category }}{{ form.category.errors }}</div>
+      <div><label for="{{ form.tags_text.id_for_label }}">标签（逗号分隔）</label>{{ form.tags_text }}{{ form.tags_text.errors }}</div>
+      <div><label for="{{ form.source_type.id_for_label }}">教程类型</label>{{ form.source_type }}{{ form.source_type.errors }}</div>
+    </div>
+    <div class="recipe-wide-field"><label for="{{ form.ingredients_text.id_for_label }}">主要食材（每行一种）</label>{{ form.ingredients_text }}{{ form.ingredients_text.errors }}
+      <p class="small-note">只填要匹配的主要食材；调味料可写在做法里。已知别名如“西红柿”会归为“番茄”。</p></div>
+    <div class="recipe-wide-field"><label for="{{ form.steps_text.id_for_label }}">做法（每行一步）</label>{{ form.steps_text }}{{ form.steps_text.errors }}</div>
+    <div class="recipe-wide-field"><label for="{{ form.source_url.id_for_label }}">原教程 HTTPS 链接（可选）</label>{{ form.source_url }}{{ form.source_url.errors }}<p class="small-note">收藏网上教程时建议保存原链接；只上传本机图片或视频时可以留空，保存菜谱后再添加文件。</p></div>
+    <div class="recipe-wide-field"><label for="{{ form.source_note.id_for_label }}">补充笔记</label>{{ form.source_note }}{{ form.source_note.errors }}</div>
+    <button type="submit">保存家庭菜谱</button>
+  </form>
+  {% if recipe %}<p><a href="{% url 'recipe_detail' recipe_id %}">返回菜谱</a></p>{% endif %}
+</main>
+{% include 'core/nav.html' with active_tab='recipes' %}
+</body>
+</html>

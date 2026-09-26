@@ -1,0 +1,894 @@
+{
+  "schema_version": 1,
+  "recipes": [
+    {
+      "id": "tomato-egg",
+      "title": "番茄炒蛋",
+      "category": "家常炒菜",
+      "cuisine": "家常",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 8,
+      "active_minutes": 12,
+      "wait_minutes": 0,
+      "total_minutes": 20,
+      "equipment": [
+        "炒锅",
+        "砧板",
+        "菜刀",
+        "碗",
+        "食物温度计"
+      ],
+      "ingredients": [
+        {
+          "name": "番茄",
+          "quantity": "300",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "鸡蛋",
+          "quantity": "2",
+          "unit": "piece",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "食用油",
+          "quantity": "15",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "番茄",
+          "action": "流水清洗表面，去蒂，切约2厘米块；若表面已有损坏，先核对是否可用。"
+        },
+        {
+          "name": "鸡蛋",
+          "action": "磕入碗中打散；接触生蛋后的手和工具清洗后再碰熟食。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "8",
+              "unit": "g"
+            },
+            {
+              "name": "鸡蛋",
+              "quantity": "2",
+              "unit": "piece"
+            }
+          ],
+          "action": "锅热后加入8克油，倒入蛋液，轻推至基本凝固后盛到干净碗中。",
+          "heat": "中火",
+          "minutes_min": 2,
+          "minutes_max": 4,
+          "done_when": "蛋液不再流动。",
+          "tip": "若锅底迅速焦黄，调低火力并尽快盛出。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "7",
+              "unit": "g"
+            },
+            {
+              "name": "番茄",
+              "quantity": "300",
+              "unit": "g"
+            }
+          ],
+          "action": "加剩余7克油，倒入番茄翻炒并压出汁。",
+          "heat": "中火",
+          "minutes_min": 4,
+          "minutes_max": 6,
+          "done_when": "番茄明显变软并出汁。",
+          "tip": "锅底变干时改小火，避免焦糊。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "盐",
+              "quantity": "2",
+              "unit": "g"
+            }
+          ],
+          "action": "加入盐拌匀，再把熟蛋倒回锅中翻匀。",
+          "heat": "小火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "整道蛋菜中心达到蛋类安全温度规则要求，外观不能代替测温。",
+          "tip": "未能核对安全温度时不要仅凭颜色判定已熟。"
+        }
+      ],
+      "safety_rule_ids": [
+        "egg_71c"
+      ],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "pepper-potato",
+      "title": "青椒土豆丝",
+      "category": "家常炒菜",
+      "cuisine": "家常",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 12,
+      "active_minutes": 10,
+      "wait_minutes": 0,
+      "total_minutes": 22,
+      "equipment": [
+        "炒锅",
+        "砧板",
+        "菜刀"
+      ],
+      "ingredients": [
+        {
+          "name": "土豆",
+          "quantity": "300",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "青椒",
+          "quantity": "120",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "食用油",
+          "quantity": "15",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "土豆",
+          "action": "洗净去皮，切约3毫米细丝；切好后用清水短暂冲去表面淀粉并沥干。"
+        },
+        {
+          "name": "青椒",
+          "action": "洗净，去蒂去籽，切约3毫米细丝。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "15",
+              "unit": "g"
+            },
+            {
+              "name": "土豆",
+              "quantity": "300",
+              "unit": "g"
+            }
+          ],
+          "action": "锅热后下油和沥干的土豆丝，持续翻动。",
+          "heat": "中火",
+          "minutes_min": 5,
+          "minutes_max": 7,
+          "done_when": "土豆丝由生硬变柔软，没有焦黑。",
+          "tip": "锅内水汽过多时分批炒，避免堆得太厚。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "青椒",
+              "quantity": "120",
+              "unit": "g"
+            },
+            {
+              "name": "盐",
+              "quantity": "2",
+              "unit": "g"
+            }
+          ],
+          "action": "加入青椒丝与盐翻匀，继续加热。",
+          "heat": "中火",
+          "minutes_min": 3,
+          "minutes_max": 5,
+          "done_when": "青椒变软且土豆完全熟透。",
+          "tip": "尝味前确保土豆已经充分加热，不要用尝生食来判断安全。"
+        }
+      ],
+      "safety_rule_ids": [],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "cucumber-egg",
+      "title": "黄瓜炒蛋",
+      "category": "家常炒菜",
+      "cuisine": "家常",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 8,
+      "active_minutes": 10,
+      "wait_minutes": 0,
+      "total_minutes": 18,
+      "equipment": [
+        "炒锅",
+        "砧板",
+        "菜刀",
+        "碗",
+        "食物温度计"
+      ],
+      "ingredients": [
+        {
+          "name": "黄瓜",
+          "quantity": "250",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "鸡蛋",
+          "quantity": "2",
+          "unit": "piece",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "食用油",
+          "quantity": "15",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "黄瓜",
+          "action": "洗净表面，切约3毫米薄片，沥去多余水分。"
+        },
+        {
+          "name": "鸡蛋",
+          "action": "打入碗中搅散，生蛋工具与熟食器具分开。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "8",
+              "unit": "g"
+            },
+            {
+              "name": "鸡蛋",
+              "quantity": "2",
+              "unit": "piece"
+            }
+          ],
+          "action": "先用8克油炒蛋，蛋液凝固后盛出。",
+          "heat": "中火",
+          "minutes_min": 2,
+          "minutes_max": 4,
+          "done_when": "看不到流动蛋液。",
+          "tip": "不要让已熟鸡蛋接触生蛋碗。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "7",
+              "unit": "g"
+            },
+            {
+              "name": "黄瓜",
+              "quantity": "250",
+              "unit": "g"
+            }
+          ],
+          "action": "加入剩余油和黄瓜片，翻炒至略软。",
+          "heat": "中火",
+          "minutes_min": 3,
+          "minutes_max": 5,
+          "done_when": "黄瓜片温热且边缘略软。",
+          "tip": "水分较多时保持翻动，避免长时间焖软。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "盐",
+              "quantity": "2",
+              "unit": "g"
+            }
+          ],
+          "action": "加盐并倒回鸡蛋，翻匀后继续加热。",
+          "heat": "小火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "整道蛋菜达到蛋类安全温度规则要求。",
+          "tip": "若无法测温，不要仅凭外观宣称符合安全温度。"
+        }
+      ],
+      "safety_rule_ids": [
+        "egg_71c"
+      ],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "broccoli",
+      "title": "清炒西兰花",
+      "category": "清淡素菜",
+      "cuisine": "家常",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 10,
+      "active_minutes": 10,
+      "wait_minutes": 0,
+      "total_minutes": 20,
+      "equipment": [
+        "炒锅",
+        "砧板",
+        "菜刀"
+      ],
+      "ingredients": [
+        {
+          "name": "西兰花",
+          "quantity": "300",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "食用油",
+          "quantity": "12",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "西兰花",
+          "action": "切成约3厘米小朵，流水清洗并沥干；粗茎去老皮切薄片。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "12",
+              "unit": "g"
+            },
+            {
+              "name": "西兰花",
+              "quantity": "300",
+              "unit": "g"
+            }
+          ],
+          "action": "锅热后加油，放入小朵和茎片翻炒；堆放太厚时分两次炒。",
+          "heat": "中火",
+          "minutes_min": 6,
+          "minutes_max": 9,
+          "done_when": "茎部变软且小朵充分受热。",
+          "tip": "若锅底焦糊，降低火力并分批处理。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "盐",
+              "quantity": "2",
+              "unit": "g"
+            }
+          ],
+          "action": "加入盐后再翻匀。",
+          "heat": "小火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "盐分布均匀，西兰花已熟。",
+          "tip": "不要把表面变绿当作唯一熟度依据。"
+        }
+      ],
+      "safety_rule_ids": [],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "lettuce",
+      "title": "清炒生菜",
+      "category": "清淡素菜",
+      "cuisine": "家常",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 8,
+      "active_minutes": 7,
+      "wait_minutes": 0,
+      "total_minutes": 15,
+      "equipment": [
+        "炒锅",
+        "砧板",
+        "菜刀"
+      ],
+      "ingredients": [
+        {
+          "name": "生菜",
+          "quantity": "300",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "食用油",
+          "quantity": "12",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "生菜",
+          "action": "逐叶检查、流水清洗，沥干后把大叶切成约5厘米段。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "12",
+              "unit": "g"
+            },
+            {
+              "name": "生菜",
+              "quantity": "300",
+              "unit": "g"
+            }
+          ],
+          "action": "锅热后加油和沥干生菜，快速翻炒。",
+          "heat": "中大火",
+          "minutes_min": 3,
+          "minutes_max": 5,
+          "done_when": "叶片软下并整体充分受热。",
+          "tip": "锅小则分批，避免大量生菜堆成一团。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "盐",
+              "quantity": "2",
+              "unit": "g"
+            }
+          ],
+          "action": "撒盐翻匀后立即盛出。",
+          "heat": "小火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "盐均匀分布，叶片没有生硬部分。",
+          "tip": "不要长时间焖煮，避免大量出水。"
+        }
+      ],
+      "safety_rule_ids": [],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "seaweed-egg-soup",
+      "title": "紫菜蛋花汤",
+      "category": "汤羹",
+      "cuisine": "家常",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 6,
+      "active_minutes": 8,
+      "wait_minutes": 0,
+      "total_minutes": 14,
+      "equipment": [
+        "汤锅",
+        "碗",
+        "量杯",
+        "食物温度计"
+      ],
+      "ingredients": [
+        {
+          "name": "紫菜",
+          "quantity": "8",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "干"
+        },
+        {
+          "name": "鸡蛋",
+          "quantity": "2",
+          "unit": "piece",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "饮用水",
+          "quantity": "500",
+          "unit": "ml",
+          "role": "汤底",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "紫菜",
+          "action": "检查包装和储存状态，按包装说明处理；无需机械套用浸泡。"
+        },
+        {
+          "name": "鸡蛋",
+          "action": "打入碗中搅散，避免蛋壳落入。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "汤锅",
+          "uses": [
+            {
+              "name": "饮用水",
+              "quantity": "500",
+              "unit": "ml"
+            },
+            {
+              "name": "紫菜",
+              "quantity": "8",
+              "unit": "g"
+            }
+          ],
+          "action": "量取饮用水烧开，加入紫菜搅散。",
+          "heat": "大火至沸后中火",
+          "minutes_min": 3,
+          "minutes_max": 5,
+          "done_when": "汤重新沸腾，紫菜散开。",
+          "tip": "避免热汤飞溅。"
+        },
+        {
+          "equipment": "汤锅",
+          "uses": [
+            {
+              "name": "鸡蛋",
+              "quantity": "2",
+              "unit": "piece"
+            }
+          ],
+          "action": "保持微沸，把蛋液缓慢绕圈倒入，不立即剧烈搅拌。",
+          "heat": "中火",
+          "minutes_min": 2,
+          "minutes_max": 3,
+          "done_when": "蛋花完全凝固，并达到蛋类安全温度规则要求。",
+          "tip": "时间和外观不能替代需要的测温核验。"
+        },
+        {
+          "equipment": "汤锅",
+          "uses": [
+            {
+              "name": "盐",
+              "quantity": "2",
+              "unit": "g"
+            }
+          ],
+          "action": "加入盐搅匀后关火。",
+          "heat": "小火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "盐已溶解。",
+          "tip": "端锅时防烫。"
+        }
+      ],
+      "safety_rule_ids": [
+        "egg_71c"
+      ],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "tofu-potato-mild",
+      "title": "微辣土豆豆腐炒",
+      "category": "家常炒菜",
+      "cuisine": "川菜",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 1,
+      "prep_minutes": 8,
+      "active_minutes": 19,
+      "wait_minutes": 0,
+      "total_minutes": 29,
+      "equipment": [
+        "炒锅",
+        "砧板",
+        "菜刀",
+        "碗"
+      ],
+      "ingredients": [
+        {
+          "name": "豆腐",
+          "quantity": "400",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "土豆",
+          "quantity": "400",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "干辣椒",
+          "quantity": "2",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "干"
+        },
+        {
+          "name": "食用油",
+          "quantity": "16",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "盐",
+          "quantity": "3",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "土豆",
+          "action": "流水冲去表面泥土，去皮后切约1厘米薄片；用干净水冲去切面淀粉，沥干，便于均匀受热。"
+        },
+        {
+          "name": "豆腐",
+          "action": "沥去包装液，切约2厘米块，放入干净碗中；轻拿轻放，避免碎裂。"
+        },
+        {
+          "name": "干辣椒",
+          "action": "剪成小段；怕辣可在确认材料与步骤后改为更少用量，并重新核对口味与营养。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "10",
+              "unit": "g"
+            },
+            {
+              "name": "土豆",
+              "quantity": "400",
+              "unit": "g"
+            }
+          ],
+          "action": "中火热锅，倒入10克油，再将沥干的土豆片平铺入锅；分次翻面，不要一开始堆得过厚。",
+          "heat": "中火",
+          "minutes_min": 9,
+          "minutes_max": 12,
+          "done_when": "取较厚一片，用筷子可轻松戳透，中心不再生硬。",
+          "tip": "锅底发焦而中心未熟时调小火，分批摊开继续加热。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "食用油",
+              "quantity": "6",
+              "unit": "g"
+            },
+            {
+              "name": "豆腐",
+              "quantity": "400",
+              "unit": "g"
+            }
+          ],
+          "action": "把土豆推至锅边，加入剩余6克油和豆腐块，轻翻各面，不用用力压碎。",
+          "heat": "中小火",
+          "minutes_min": 5,
+          "minutes_max": 7,
+          "done_when": "豆腐表面已热透并微微上色。",
+          "tip": "豆腐易碎，可先让一面定型再翻动。"
+        },
+        {
+          "equipment": "炒锅",
+          "uses": [
+            {
+              "name": "干辣椒",
+              "quantity": "2",
+              "unit": "g"
+            },
+            {
+              "name": "盐",
+              "quantity": "3",
+              "unit": "g"
+            }
+          ],
+          "action": "加入干辣椒和3克盐，和土豆、豆腐快速翻匀后盛出。",
+          "heat": "小火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "调料均匀附着，土豆仍软熟。",
+          "tip": "辣椒变黑立即关火；不要靠试吃判断任何疑似变质食材是否安全。"
+        }
+      ],
+      "safety_rule_ids": [],
+      "source_label": "项目编写参考做法，未实测"
+    },
+    {
+      "id": "cantonese-steamed-tofu",
+      "title": "粤式清蒸豆腐",
+      "category": "清蒸",
+      "cuisine": "粤菜",
+      "servings": 2,
+      "difficulty": "新手",
+      "spice_level": 0,
+      "prep_minutes": 5,
+      "active_minutes": 5,
+      "wait_minutes": 10,
+      "total_minutes": 20,
+      "equipment": [
+        "蒸锅",
+        "砧板",
+        "菜刀",
+        "碗",
+        "量杯"
+      ],
+      "ingredients": [
+        {
+          "name": "豆腐",
+          "quantity": "400",
+          "unit": "g",
+          "role": "主料",
+          "food_state": "生"
+        },
+        {
+          "name": "酱油",
+          "quantity": "12",
+          "unit": "ml",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "食用油",
+          "quantity": "6",
+          "unit": "g",
+          "role": "调味料",
+          "food_state": "生"
+        },
+        {
+          "name": "葱",
+          "quantity": "15",
+          "unit": "g",
+          "role": "配料",
+          "food_state": "生"
+        }
+      ],
+      "preparations": [
+        {
+          "name": "豆腐",
+          "action": "倒去包装液，切约2厘米厚片，平铺在耐热浅碗中。"
+        },
+        {
+          "name": "葱",
+          "action": "流水清洗表面，去根，切约3毫米葱花；切菜用的刀和板保持清洁。"
+        }
+      ],
+      "steps": [
+        {
+          "equipment": "蒸锅",
+          "uses": [
+            {
+              "name": "豆腐",
+              "quantity": "400",
+              "unit": "g"
+            }
+          ],
+          "action": "蒸锅加适量蒸汽用水并烧开；把盛豆腐的耐热碗放上蒸屉，盖盖蒸。蒸锅用水不计入菜肴材料，也不接触食物。",
+          "heat": "沸水持续出蒸汽",
+          "minutes_min": 8,
+          "minutes_max": 10,
+          "done_when": "豆腐中心热透，碗内有少量热汁。",
+          "tip": "打开锅盖时先避开蒸汽，使用隔热工具取碗。"
+        },
+        {
+          "equipment": "碗",
+          "uses": [
+            {
+              "name": "酱油",
+              "quantity": "12",
+              "unit": "ml"
+            },
+            {
+              "name": "食用油",
+              "quantity": "6",
+              "unit": "g"
+            },
+            {
+              "name": "葱",
+              "quantity": "15",
+              "unit": "g"
+            }
+          ],
+          "action": "倒去过多蒸汁，量取12毫升酱油和6克油淋在豆腐上，再撒15克葱花。",
+          "heat": "离火",
+          "minutes_min": 1,
+          "minutes_max": 2,
+          "done_when": "酱汁分布均匀，豆腐保持热食。",
+          "tip": "若用冷藏豆腐，蒸制时间以中心热透为准；本教程未经实测。"
+        }
+      ],
+      "safety_rule_ids": [],
+      "source_label": "项目编写参考做法，未实测"
+    }
+  ]
+}

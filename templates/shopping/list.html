@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>采购 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page app-page inventory-page">
+  <p class="eyebrow"><a href="{% url 'index' %}">食尽其用</a> / 采购</p>
+  <h1>采购清单</h1>
+  <p>先核对冰箱和清单，避免买重。买到后先标记，放入冰箱时再按实际数量入库。</p>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% if error %}<p class="error" role="alert">{{ error }} {% if response_status == 503 %}请保留原请求编号重试。{% endif %}</p>{% endif %}
+
+  <section class="panel" aria-labelledby="add-heading">
+    <h2 id="add-heading">要买什么</h2>
+    <form method="post" action="{% url 'shopping_page' %}" class="fields">
+      {% csrf_token %}<input type="hidden" name="request_id" value="{{ new_request_id }}">
+      <label>食材名称 <input name="name" maxlength="80" required value="{{ draft.name|default:'' }}" autocomplete="off"></label>
+      <label>计划数量 <input name="quantity" inputmode="decimal" maxlength="16" required value="{{ draft.quantity|default:'' }}"></label>
+      <label>单位 <select name="unit"><option value="piece" {% if draft.unit == 'piece' %}selected{% endif %}>个</option><option value="g" {% if draft.unit == 'g' %}selected{% endif %}>克</option><option value="kg" {% if draft.unit == 'kg' %}selected{% endif %}>千克</option><option value="ml" {% if draft.unit == 'ml' %}selected{% endif %}>毫升</option><option value="l" {% if draft.unit == 'l' %}selected{% endif %}>升</option><option value="pack" {% if draft.unit == 'pack' %}selected{% endif %}>包</option></select></label>
+      <label class="shopping-check"><input type="checkbox" name="confirm_duplicate" value="true" {% if draft.confirm_duplicate %}checked{% endif %}> 我已核对冰箱和清单，即使已有同名食材仍需购买</label>
+      <button type="submit">加入清单</button>
+    </form>
+    <p class="small-note">名称按已知别名或精确文字比较；不同单位不会自动换算。实际买到的数量可在入库时填写。</p>
+  </section>
+
+  <section aria-labelledby="open-heading"><h2 id="open-heading">待办（{{ open_count }}）</h2>
+    {% for item in open %}<article class="panel shopping-item">
+      <h3>{{ item.name }} · {{ item.quantity }} {{ item.unit_label }}</h3>
+      <p class="recipe-meta">{{ item.status_label }} · 编号 {{ item.id }}</p>
+      {% if item.status == 'needed' %}
+      <form method="post" action="{% url 'shopping_bought' item.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ item.request_id }}"><input type="hidden" name="version" value="{{ item.version }}"><button type="submit">买到了</button></form>
+      {% elif item.status == 'bought' %}
+      <p class="small-note">“买到了”不会增加库存。请核对实物、日期和储存状况，再入库。</p>
+      <form method="post" action="{% url 'shopping_receive' item.id %}" class="fields">
+        {% csrf_token %}<input type="hidden" name="request_id" value="{{ item.request_id }}"><input type="hidden" name="version" value="{{ item.version }}">
+        <label>实际数量（{{ item.unit_label }}） <input name="quantity" inputmode="decimal" maxlength="16" required value="{{ item.draft.quantity|default:item.quantity }}"></label>
+        <label>放在哪里 <select name="location"><option value="fridge">冷藏</option><option value="freezer" {% if item.draft.location == 'freezer' %}selected{% endif %}>冷冻</option><option value="pantry" {% if item.draft.location == 'pantry' %}selected{% endif %}>常温</option><option value="other" {% if item.draft.location == 'other' %}selected{% endif %}>其他</option></select></label>
+        <label>食材状态 <select name="status"><option value="active">在库</option><option value="suspect" {% if item.draft.status == 'suspect' %}selected{% endif %}>疑似变质</option></select></label>
+        <label>储存状况 <select name="storage_status"><option value="needs_check">待核对</option><option value="verified" {% if item.draft.storage_status == 'verified' %}selected{% endif %}>已核对</option></select></label>
+        <details class="advanced-fields"><summary>包装与采购日期</summary>
+          <label>包装日期状态 <select name="package_date_status"><option value="unknown">未记录</option><option value="not_applicable" {% if item.draft.package_date_status == 'not_applicable' %}selected{% endif %}>不适用</option><option value="known" {% if item.draft.package_date_status == 'known' %}selected{% endif %}>已记录</option></select></label>
+          <label>包装日期 <input type="date" name="package_date" value="{{ item.draft.package_date|default:'' }}"></label>
+          <label>采购日期（留空为今天） <input type="date" name="purchase_date" value="{{ item.draft.purchase_date|default:'' }}"></label>
+        </details>
+        <button type="submit">确认入库</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{% url 'shopping_cancel' item.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ item.request_id }}"><input type="hidden" name="version" value="{{ item.version }}"><button class="secondary-button" type="submit">取消这项</button></form>
+    </article>{% empty %}<p class="empty-state">清单还没有待办。先看看冰箱里有什么，再添加需要买的食材。</p>{% endfor %}
+    {% if open_count > 100 %}<p class="small-note">这里只显示前 100 项；请先完成较早的采购项。</p>{% endif %}
+  </section>
+
+  <section class="panel" aria-labelledby="stock-heading"><h2 id="stock-heading">冰箱中可用的食材</h2>
+    <p class="small-note">仅统计在库、储存已核对且包装日期未过的批次；同名不同单位分开显示。其他已记录批次请到<a href="{% url 'inventory_page' %}">冰箱</a>核对，不能算作可用。数量不等于足够做某道菜。</p>
+    {% for row in available %}<p class="shopping-stock-row">{{ row.name }} · {{ row.quantity }} {{ row.unit_label }}</p>{% empty %}<p class="empty-state">当前没有已核对的可用批次；疑似变质或待核对的批次请到冰箱查看。</p>{% endfor %}
+  </section>
+  <section aria-labelledby="history-heading"><h2 id="history-heading">最近记录</h2>
+    {% for item in history %}<p class="panel">{{ item.name }} · {{ item.quantity }} {{ item.unit_label }} · {{ item.status_label }}{% if item.received_lot_id %} · 批次 {{ item.received_lot_id }}{% endif %}</p>{% empty %}<p class="empty-state">还没有已入库或取消的采购项。</p>{% endfor %}
+  </section>
+</main>{% include 'core/nav.html' with active_tab=active_tab %}</body></html>

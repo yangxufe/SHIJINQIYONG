@@ -1,0 +1,64 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>做什么 · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<main class="page app-page" id="recipes-page">
+  <p class="eyebrow">食尽其用 / 做什么</p>
+  <h1>做什么</h1>
+  <p class="small-note">菜谱按当前可用食材的匹配程度排序。疑似变质、储存待核对和包装日期已过的批次不计入；这里不猜用量，选择菜谱不会扣库存。</p>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  <form method="get" action="{% url 'workbench_page' %}" class="panel"><h2>按这餐的需求安排</h2>
+    <label for="meal-request">告诉我人数、口味、食材或时间</label>
+    <textarea id="meal-request" name="raw_text" maxlength="600" rows="2" placeholder="例如：两个人，高蛋白、高碳水、少添加糖，半小时左右"></textarea>
+    <button type="submit">解释条件并找菜谱</button>
+    <p class="small-note">下一步可编辑人数、库存模式、器材和限制；生成与浏览不会自动扣库存。</p>
+  </form>
+  <p><a class="action-link" href="{% url 'recipe_new' %}">＋ 新增或收藏家庭菜谱</a></p>
+  <p><a class="action-link" href="{% url 'workbench_page' %}">按人数、库存和口味安排这餐</a></p>
+  <form method="get" action="{% url 'recipes_page' %}" class="panel recipe-filter">
+    <label for="recipe-category">分类</label>
+    <select id="recipe-category" name="category">
+      <option value="">全部分类</option>
+      {% for category in categories %}<option value="{{ category }}" {% if category == active_category %}selected{% endif %}>{{ category }}</option>{% endfor %}
+    </select>
+    <label for="recipe-query">在家庭菜谱中找名称、食材或标签</label>
+    <input id="recipe-query" name="q" value="{{ query }}" maxlength="80">
+    <button type="submit">筛选菜谱</button>
+  </form>
+  <section class="panel" aria-labelledby="outside-search-heading">
+    <h2 id="outside-search-heading">从网上找教程</h2>
+    <p class="small-note">输入关键词后，选择视频、文字或图片搜索。只有点击外部搜索时，关键词才会发给对应网站；本站不会自动上传家庭库存。</p>
+    <form method="get" action="{% url 'recipes_page' %}" class="search-row">
+      <label class="visually-hidden" for="recipe-find">教程关键词</label>
+      <input id="recipe-find" name="find" value="{{ find }}" maxlength="80" placeholder="例如 番茄 鸡蛋">
+      <button type="submit">生成搜索入口</button>
+    </form>
+    {% if search_links %}<div class="recipe-search-links">
+      <a href="{{ search_links.video }}" target="_blank" rel="noopener noreferrer">搜索视频教程</a>
+      <a href="{{ search_links.article }}" target="_blank" rel="noopener noreferrer">搜索文字教程</a>
+      <a href="{{ search_links.images }}" target="_blank" rel="noopener noreferrer">搜索图片教程</a>
+    </div><p class="small-note">找到喜欢的教程后，在“新增或收藏家庭菜谱”中填写标题、食材、分类、链接与笔记；也可上传自己的图片或视频。</p>{% endif %}
+  </section>
+  <h2>按食材匹配的菜谱{% if active_category %} · {{ active_category }}{% endif %}</h2>
+  {% for recipe in recipes %}
+  <article class="panel recipe-card">
+    <h2>{{ recipe.name }}</h2>
+    <p class="recipe-meta">{{ recipe.category }} · {{ recipe.source_label }}{% for tag in recipe.tags %} · #{{ tag }}{% endfor %}</p>
+    <p>{% if recipe.has_all %}<strong>食材已找到，用量待确认</strong>{% else %}找到 {{ recipe.matched_count }} / {{ recipe.ingredient_count }} 种食材{% endif %}</p>
+    <p class="small-note">所需：{{ recipe.ingredients|join:'、' }}</p>
+    {% if recipe.missing %}<p class="small-note">还缺：{{ recipe.missing|join:'、' }}</p>{% endif %}
+    <a href="{% url 'recipe_detail' recipe.id %}">查看做法与批次</a>
+  </article>
+  {% empty %}<p class="empty-state">当前筛选没有菜谱。可清除分类或搜索词，也可以新增家庭菜谱。</p>
+  {% endfor %}
+  <p class="small-note">这里的“已找到”只表示库存里有对应名称的可用批次；请自行核对真实份量和食材状况。</p>
+</main>
+{% include 'core/nav.html' with active_tab='recipes' %}
+</body>
+</html>

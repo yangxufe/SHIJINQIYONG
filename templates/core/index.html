@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>今天先吃 · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<main class="page app-page" id="today-page" data-today-url="{% url 'today_api' %}">
+  <header class="app-header">
+    <p class="eyebrow">单家庭 · 今天</p>
+    <h1>今天先吃</h1>
+    <p class="small-note">按家庭时区 {{ time_zone }} 的 {{ today }} 查看。计划日期是安排提醒，不是安全期限。</p>
+  </header>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  <div class="toolbar">
+    <button type="button" id="today-refresh" class="secondary-button">刷新今天</button>
+    <span id="today-state" class="submit-state" role="status" aria-live="polite"></span>
+  </div>
+  <section aria-labelledby="arrange-heading">
+    <div class="section-heading"><h2 id="arrange-heading">先安排</h2><span id="arrange-count">{{ arrange_count }} 批待安排</span></div>
+    <div id="today-arrange">
+      {% for lot in arrange %}
+      <article class="panel today-card">
+        <h3>{{ lot.name }}</h3>
+        <p><strong>{{ lot.quantity }} {{ lot.unit_label }}</strong> · {{ lot.location_label }}</p>
+        <p class="small-note">{{ lot.reason }}{% if lot.planned_use_date %} · 计划 {{ lot.planned_use_date }}{% endif %}</p>
+        <p class="small-note">包装日期：{% if lot.package_date %}{{ lot.package_date }}{% else %}{{ lot.package_date_status_label }}{% endif %}；储存已由成员记录为已核对。</p>
+        <a href="{% url 'inventory_edit_page' lot.id %}">查看批次</a>
+      </article>
+      {% empty %}
+      <p class="empty-state">{% if stock_count %}目前没有可安排的批次，请先查看“需要核对”。{% else %}还没有在库食材。先录入最容易忘记的 5 样，之后按真实情况补充。{% endif %}</p>
+      {% endfor %}
+    </div>
+  </section>
+  <section aria-labelledby="review-heading">
+    <div class="section-heading"><h2 id="review-heading">需要核对</h2><span id="review-count">{{ needs_review_count }} 批</span></div>
+    <div id="today-review">
+      {% for lot in needs_review %}
+      <article class="panel today-card review-card">
+        <h3>{{ lot.name }}</h3>
+        <p><strong>{{ lot.quantity }} {{ lot.unit_label }}</strong> · {{ lot.location_label }}</p>
+        <p class="small-note">{% for reason in lot.reasons %}{{ reason }}{% if not forloop.last %}；{% endif %}{% endfor %}</p>
+        <a href="{% url 'inventory_edit_page' lot.id %}">查看批次</a>
+      </article>
+      {% empty %}<p class="empty-state">目前没有待核对批次。</p>{% endfor %}
+    </div>
+  </section>
+  <p class="small-note">显示各组前 3 批。具体状况请由成员核对，页面排序不表示食用安全保证。</p>
+  <div class="account-actions">
+    {% if request.user.member_role.role == "admin" %}<a href="{% url 'household_settings' %}">家庭设置</a>{% endif %}
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="text-button">退出登录</button></form>
+  </div>
+</main>
+{% include 'core/nav.html' with active_tab='today' %}
+<script type="module" src="{% static 'js/today.js' %}"></script>
+</body>
+</html>

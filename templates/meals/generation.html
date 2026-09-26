@@ -1,0 +1,23 @@
+{% load static %}
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>生成任务 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page app-page"><p class="eyebrow"><a href="{% url 'workbench_results' task.recipe_request.id %}">候选菜谱</a> / 生成任务</p><h1>菜谱生成</h1>
+  <section class="panel" {% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}data-generation-status="{% url 'generation_status' task.id %}"{% endif %}><p>当前状态：{{ task.get_status_display }}</p>
+    {% if task.status == 'failed' or task.status == 'timed_out' %}<p class="error">未生成可用菜谱。错误代码：{{ task.error_code }}。本地菜谱和库存功能仍可正常使用。</p>{% endif %}
+    {% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}
+      <p class="small-note">刷新页面可查看真实状态；这里不显示虚构进度。等待时可以继续使用冰箱和采购。</p>
+      <form method="post" action="{% url 'generation_cancel' task.id %}">{% csrf_token %}<button type="submit" class="secondary-button">取消发布结果</button></form>
+    {% endif %}
+    {% if task.status == 'success' %}<h2>{{ task.result.title }}</h2><p class="small-note">AI 生成，已通过服务端已知规则检查，未经实际烹饪验证；再次使用时按当前库存和限制重算。</p>
+      <p>{{ task.result.cuisine }} · {{ task.result.servings }} 人份基准 · 备料 {{ task.result.prep_minutes }} 分钟 · 操作 {{ task.result.active_minutes }} 分钟 · 等待 {{ task.result.wait_minutes }} 分钟 · 总计约 {{ task.result.total_minutes }} 分钟</p>
+      {% if not match.feasible %}<p class="error">当前库存或硬条件已变化，暂不可直接执行。{% for blocker in match.blockers %}{{ blocker }}；{% endfor %}</p>{% endif %}
+      <h3>材料与当前库存</h3><ul>{% for item in task.result.ingredients %}<li>{{ item.name }} {{ item.quantity }} {{ item.unit }} · {{ item.role }}</li>{% endfor %}</ul>
+      {% for gap in match.gaps %}<p>理论净缺口：{{ gap.ingredient }} {{ gap.quantity }} {{ gap.unit }}</p>{% endfor %}
+      <h3>器材</h3><p>{{ task.result.equipment|join:'、' }}</p>
+      <h3>备料</h3><ul>{% for item in task.result.preparations %}<li>{{ item.name }}：{{ item.action }}</li>{% endfor %}</ul>
+      <h3>详细步骤</h3><ol>{% for step in task.result.steps %}<li><strong>{{ step.equipment }} · {{ step.heat }} · {{ step.minutes_min }}–{{ step.minutes_max }} 分钟</strong><br>{{ step.action }}<br>下一步判断：{{ step.done_when }}<br>注意：{{ step.tip }}</li>{% endfor %}</ol>
+      {% for note in safety_notes %}<p>{{ note.text }} <a href="{{ note.source }}" rel="noopener noreferrer" target="_blank">来源：USDA FSIS</a></p>{% endfor %}
+      <p>当前每人蛋白质：{{ match.nutrition.per_person.protein_g|default:'未知/未核算' }} g；碳水：{{ match.nutrition.per_person.carbohydrate_g|default:'未知/未核算' }} g。仅供一般饮食规划。</p>
+      <form method="post" action="{% url 'generation_save' task.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ task.request_id }}"><button type="submit">确认保存到家庭菜谱</button></form>
+    {% endif %}
+  </section>
+</main>{% include 'core/nav.html' with active_tab='recipes' %}{% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}<script type="module" src="{% static 'js/generation-status.js' %}"></script>{% endif %}</body></html>
