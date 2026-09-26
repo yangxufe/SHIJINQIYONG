@@ -41,6 +41,8 @@ bash scripts/setup_macos.sh 192.168.1.50 192.168.1.0/24 Asia/Shanghai
 
 脚本创建 `.venv`、私有 `data/runtime.env`、随机 Django 密钥、空 SQLite、迁移与静态文件；已有运行配置不会被覆盖。账号密码在终端交互输入，不出现在命令历史。时区例子为 `Asia/Shanghai`；按实际家庭时区替换，留空则默认 UTC。安装前需要 Caddy 和 Python 3.12 已在 PATH 中。设置脚本不会安装根证书或打开路由器端口。
 
+如需在这台 Mac 上自行运行回归测试，完成首次安装后执行 `mkdir -p work && .venv/bin/python manage.py test tests --settings=config.settings.test`。测试数据只进入独立测试库，不应写入家庭数据库。
+
 若换了已确认的家庭 Wi-Fi，先停止 Caddy，核对新 IP 与子网，再运行：
 
 ```bash

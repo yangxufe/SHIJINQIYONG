@@ -449,3 +449,7 @@
 实际检查：完整 Django 回归 94 项通过，新增 3 项 Mac 配置单元检查；`makemigrations --check --dry-run` 无差异，`pip check` 无冲突，`check --deploy` 退出码 0、仅既有 IP HSTS `security.W004`。在 Windows 开发机用 Caddy 对带模拟 Mac 环境变量的配置执行 `adapt` 与 `adapt --validate`，两者退出码 0；没有在真实 Mac 运行 Bash 安装、系统证书信任或手机访问。Windows 工具包不含 Bash，`bash -n` 未执行，不能把 Caddy 配置解析当作 Mac 端到端上线。
 
 待上传后补记远端提交 ID、实际下载核对、文件排除审计与任何授权阻断。Mac 运行者仍须自行确认可信家庭网络、安装必要依赖、创建本地成员账号、信任本机新 CA，并按 `docs/MACOS.md` 现场测试。
+
+**GitHub 实际上传与下载：**以明确的 156 文件白名单提交到 `yangxufe/SHIJINQIYONG` 的 `main`，首个程序提交 `d78346dc50a776bebbac16c35cec74591d51b158` 已推送成功；远端原有初始 README 保留在 Git 历史。提交前 ZIP CRC、路径/扩展名排除、常见私钥/令牌格式扫描与暂存名单一致性均通过，未上传生产 `data/`、`.venv/`、`work/`、`outputs/`、媒体、日志、运行配置、Cookie 或 CA 私钥。最初 `.gitignore` 的未锚定 `data/` 会误排除公开的 `meals/data/`，已改为仅忽略根目录 `/data/`，三份公开 JSON 均在提交中。
+
+推送后以当前有权限的 Git 凭据从 GitHub **重新克隆**，取得同一提交、156 个受控文件；未用另一个协作者账号实测权限。下载副本第一次从原项目工作目录启动测试，因 Python 导入到原项目的 `tests` 失败；改在副本目录运行，发现尚未初始化的私有 `data/` 缺失。创建测试所需的空 `data/` 后，下载副本完整 94 项回归通过，原工作目录与数据库未作为测试输入。真正 Mac 首次安装脚本会创建该私有目录；Mac 实机安装、HTTPS 根证书信任和手机访问仍未执行。所有获得仓库读取权限并接受邀请的成员可按 `docs/MACOS.md` 下载程序；GitHub 权限授予与成员的实际下载仍须由仓库所有者及该成员验证。
