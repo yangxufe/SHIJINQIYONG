@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from inventory import services as inventory_service
@@ -33,24 +34,33 @@ def _detail_context(recipe, request_id, draft):
 
 @require_GET
 def recipe_list(request):
+    if "find" in request.GET:
+        return redirect(f"{reverse('recipe_search_results')}?{request.GET.urlencode()}")
     category = request.GET.get("category", "").strip()
     query = request.GET.get("q", "").strip()
-    find = request.GET.get("find", "").strip()
-    if len(find) > 80:
-        find = ""
     try:
         context = services.list_recipes(request.user, category=category, query=query)
     except inventory_service.InventoryError as exc:
         return render(request, "inventory/error.html", {"error": exc.message}, status=exc.status)
-    context["find"] = find
-    if find:
-        encoded = quote_plus(find + " 做法")
-        context["search_links"] = {
+    return render(request, "meals/list.html", context)
+
+
+@require_GET
+def recipe_search_results(request):
+    terms = request.GET.getlist("find")
+    term = terms[0].strip() if len(terms) == 1 else ""
+    if not term or len(term) > 80:
+        messages.error(request, "请先输入食材。" if not term else "食材关键词不能超过 80 个字。")
+        return redirect("recipes_page")
+    encoded = quote_plus(term + " 做法")
+    return render(request, "meals/search_results.html", {
+        "term": term,
+        "search_links": {
             "video": "https://search.bilibili.com/all?keyword=" + encoded,
             "article": "https://www.bing.com/search?q=" + encoded,
             "images": "https://www.bing.com/images/search?q=" + encoded,
-        }
-    return render(request, "meals/list.html", context)
+        },
+    })
 
 
 @require_GET

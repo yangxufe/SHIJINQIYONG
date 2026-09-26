@@ -40,7 +40,6 @@
         <label>计划使用日期 <input type="date" name="planned_use_date" value="{{ draft.planned_use_date|default:'' }}"></label>
         <label>包装日期状态 <select name="package_date_status"><option value="unknown" {% if draft.package_date_status == 'unknown' %}selected{% endif %}>未记录</option><option value="known" {% if draft.package_date_status == 'known' %}selected{% endif %}>已记录</option><option value="not_applicable" {% if draft.package_date_status == 'not_applicable' %}selected{% endif %}>不适用</option></select></label>
         <label>包装日期 <input type="date" name="package_date" value="{{ draft.package_date|default:'' }}"></label>
-        <label>包装日期原文 <input name="package_date_text" value="{{ draft.package_date_text|default:'' }}" maxlength="80"></label>
         <label>采购日期 <input type="date" name="purchase_date" value="{{ draft.purchase_date|default:'' }}"></label>
         <label>开封日期 <input type="date" name="opened_date" value="{{ draft.opened_date|default:'' }}"></label>
         <label>手动优先 <select name="manual_priority"><option value="false" {% if draft.manual_priority != 'true' %}selected{% endif %}>普通安排</option><option value="true" {% if draft.manual_priority == 'true' %}selected{% endif %}>优先安排</option></select></label>

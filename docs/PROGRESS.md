@@ -453,3 +453,14 @@
 **GitHub 实际上传与下载：**以明确的 156 文件白名单提交到 `yangxufe/SHIJINQIYONG` 的 `main`，首个程序提交 `d78346dc50a776bebbac16c35cec74591d51b158` 已推送成功；远端原有初始 README 保留在 Git 历史。提交前 ZIP CRC、路径/扩展名排除、常见私钥/令牌格式扫描与暂存名单一致性均通过，未上传生产 `data/`、`.venv/`、`work/`、`outputs/`、媒体、日志、运行配置、Cookie 或 CA 私钥。最初 `.gitignore` 的未锚定 `data/` 会误排除公开的 `meals/data/`，已改为仅忽略根目录 `/data/`，三份公开 JSON 均在提交中。
 
 推送后以当前有权限的 Git 凭据从 GitHub **重新克隆**，取得同一提交、156 个受控文件；未用另一个协作者账号实测权限。下载副本第一次从原项目工作目录启动测试，因 Python 导入到原项目的 `tests` 失败；改在副本目录运行，发现尚未初始化的私有 `data/` 缺失。创建测试所需的空 `data/` 后，下载副本完整 94 项回归通过，原工作目录与数据库未作为测试输入。真正 Mac 首次安装脚本会创建该私有目录；Mac 实机安装、HTTPS 根证书信任和手机访问仍未执行。所有获得仓库读取权限并接受邀请的成员可按 `docs/MACOS.md` 下载程序；GitHub 权限授予与成员的实际下载仍须由仓库所有者及该成员验证。
+
+## 页面局部调整（2026-09-26）
+
+- “今天”仅显示标题与“计划日期是安排提醒，不是安全期限。”，退出登录移至右上；管理员的家庭设置入口随之移到右上。今天库存 API 保留，未改库存服务。
+- “冰箱”的新建和编辑表单隐藏“包装日期原文”。数据库字段与 API 保留；编辑时不提交该字段，已有原文不会被清空。日期、数量、流水与拍照入口未改。
+- “做什么”的“生成搜索入口”改为独立 `/recipes/search-results/` 页面；空白输入在浏览器端阻止跳转，服务端空白/超长请求返回原页提示。旧 `/recipes/?find=` 链接转到新页面。外站搜索仍由用户点击才打开，不写库存或采购。
+- 变更文件：`config/urls.py`、`meals/views.py`、`templates/core/index.html`、`templates/inventory/{list,edit}.html`、`templates/meals/{list,search_results}.html`、`static/{css/app.css,js/recipe-search.js}`、`tests/{test_family_recipes,test_stage04,test_page_adjustments}.py`、`docs/{API,PROGRESS}.md`。无模型或数据库迁移。
+
+**实际验证：**隔离测试设置下页面专项 8 项通过，完整 97 项回归通过；`makemigrations --check --dry-run` 无差异，`git diff --check` 退出码 0。隔离合成账号的真实浏览器点击验证了空输入提示、有效输入跳转、结果页返回；320/360/390/1280 CSS 像素检查了相关页 `scrollWidth <= innerWidth`。这不是 Android 实机测试。生产 `collectstatic` 退出码 0（2 文件复制、6 文件后处理），Waitress 登录任务重启后恢复 `127.0.0.1:8000`，Caddy 仍监听原已确认的 `192.168.110.146:8443`。使用公开根证书经 Python 标准 TLS 校验 `/health/` 200、新 JS 200，匿名新页面跳到登录页；Windows curl 的 Schannel 对同一 DER 根证书报“certificate chain is incomplete”，不将其记作成功。`check --deploy` 退出码 0，仅既有 HSTS 提示。
+
+**待核对：**当前模板没有自定义的左右切换箭头，只有分页“上一页/下一页”文字和浏览器原生日期/下拉控件；已请用户指出箭头所在方框或提供截图，未猜测性修改其他控件。Android 可信 HTTPS 警告与手机端本轮页面验收仍待用户实测；真实家庭数据未用于浏览器测试。GitHub 上传状态与本轮最终提交另行补记。

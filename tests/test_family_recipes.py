@@ -96,7 +96,8 @@ class FamilyRecipeTests(TestCase):
         self.assertEqual((custom["matched_count"], custom["ingredient_count"], custom["missing"]), (1, 2, ["鸡蛋"]))
         self.assertEqual(services.list_recipes(self.user, category="家常炒菜", query="快手")["count"], 3)
         self.assertEqual(services.list_recipes(self.user, category="没有这个分类")["count"], 0)
-        self.assertContains(self.client.get("/recipes/?find=%E7%95%AA%E8%8C%84", secure=True), "search.bilibili.com")
+        self.assertNotContains(self.client.get("/recipes/", secure=True), "search.bilibili.com")
+        self.assertContains(self.client.get("/recipes/search-results/?find=%E7%95%AA%E8%8C%84", secure=True), "search.bilibili.com")
 
     def test_external_link_validation_edit_conflict_and_cook_replay(self):
         bad = FamilyRecipeForm(form_data(source_type="video", source_url="javascript:alert(1)", steps_text=""))

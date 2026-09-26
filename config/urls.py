@@ -12,6 +12,7 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("settings/", views.household_settings, name="household_settings"),
     path("recipes/", meals_views.recipe_list, name="recipes_page"),
+    path("recipes/search-results/", meals_views.recipe_search_results, name="recipe_search_results"),
     path("recipes/workbench/", workbench_views.workbench_page, name="workbench_page"),
     path("recipes/workbench/confirm/", workbench_views.confirm_conditions, name="workbench_confirm"),
     path("recipes/workbench/<uuid:plan_id>/", workbench_views.workbench_results, name="workbench_results"),

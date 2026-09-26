@@ -33,11 +33,11 @@ class TodayAndMobileTests(TestCase):
     def setUp(self):
         self.user = member()
 
-    def test_empty_today_has_real_empty_state_and_placeholder_pages(self):
+    def test_empty_today_keeps_minimal_home_and_other_pages(self):
         self.client.force_login(self.user, backend="django.contrib.auth.backends.ModelBackend")
         page = self.client.get("/", secure=True)
         self.assertEqual(page.status_code, 200)
-        self.assertContains(page, "先录入最容易忘记的 5 样")
+        self.assertContains(page, "计划日期是安排提醒，不是安全期限。")
         self.assertContains(page, 'aria-label="主要页面"')
         self.assertEqual(self.client.get("/api/today/", secure=True).json()["arrange"], [])
         self.assertContains(self.client.get("/recipes/", secure=True), "番茄炒蛋")

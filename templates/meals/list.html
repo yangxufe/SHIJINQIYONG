@@ -34,16 +34,12 @@
   <section class="panel" aria-labelledby="outside-search-heading">
     <h2 id="outside-search-heading">从网上找教程</h2>
     <p class="small-note">输入关键词后，选择视频、文字或图片搜索。只有点击外部搜索时，关键词才会发给对应网站；本站不会自动上传家庭库存。</p>
-    <form method="get" action="{% url 'recipes_page' %}" class="search-row">
+    <form method="get" action="{% url 'recipe_search_results' %}" class="search-row recipe-search-form" id="recipe-search-form">
       <label class="visually-hidden" for="recipe-find">教程关键词</label>
-      <input id="recipe-find" name="find" value="{{ find }}" maxlength="80" placeholder="例如 番茄 鸡蛋">
+      <input id="recipe-find" name="find" maxlength="80" placeholder="例如 番茄 鸡蛋" aria-describedby="recipe-search-error">
       <button type="submit">生成搜索入口</button>
     </form>
-    {% if search_links %}<div class="recipe-search-links">
-      <a href="{{ search_links.video }}" target="_blank" rel="noopener noreferrer">搜索视频教程</a>
-      <a href="{{ search_links.article }}" target="_blank" rel="noopener noreferrer">搜索文字教程</a>
-      <a href="{{ search_links.images }}" target="_blank" rel="noopener noreferrer">搜索图片教程</a>
-    </div><p class="small-note">找到喜欢的教程后，在“新增或收藏家庭菜谱”中填写标题、食材、分类、链接与笔记；也可上传自己的图片或视频。</p>{% endif %}
+    <p id="recipe-search-error" class="error recipe-search-error" role="alert" hidden>请先输入食材。</p>
   </section>
   <h2>按食材匹配的菜谱{% if active_category %} · {{ active_category }}{% endif %}</h2>
   {% for recipe in recipes %}
@@ -60,5 +56,6 @@
   <p class="small-note">这里的“已找到”只表示库存里有对应名称的可用批次；请自行核对真实份量和食材状况。</p>
 </main>
 {% include 'core/nav.html' with active_tab='recipes' %}
+<script type="module" src="{% static 'js/recipe-search.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,28 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>教程搜索入口 · 食尽其用</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<main class="page app-page">
+  <p><a href="{% url 'recipes_page' %}">← 返回做什么</a></p>
+  <h1>教程搜索入口</h1>
+  <section class="panel recipe-search-result-panel" aria-labelledby="search-results-heading">
+    <h2 id="search-results-heading">{{ term }} 的教程</h2>
+    <p class="small-note">请选择视频、文字或图片搜索。只有点击外部搜索时，关键词才会发给对应网站；本站不会自动上传家庭库存。</p>
+    <div class="recipe-search-links">
+      <a href="{{ search_links.video }}" target="_blank" rel="noopener noreferrer">搜索视频教程</a>
+      <a href="{{ search_links.article }}" target="_blank" rel="noopener noreferrer">搜索文字教程</a>
+      <a href="{{ search_links.images }}" target="_blank" rel="noopener noreferrer">搜索图片教程</a>
+    </div>
+    <p class="small-note">找到喜欢的教程后，在“新增或收藏家庭菜谱”中填写标题、食材、分类、链接与笔记；也可上传自己的图片或视频。</p>
+  </section>
+  <p><a class="action-link" href="{% url 'recipe_new' %}">＋ 新增或收藏家庭菜谱</a></p>
+</main>
+{% include 'core/nav.html' with active_tab='recipes' %}
+</body>
+</html>
