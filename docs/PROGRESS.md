@@ -466,3 +466,9 @@
 **待核对：**当前模板没有自定义的左右切换箭头，只有分页“上一页/下一页”文字和浏览器原生日期/下拉控件；已请用户指出箭头所在方框或提供截图，未猜测性修改其他控件。Android 可信 HTTPS 警告与手机端本轮页面验收仍待用户实测；真实家庭数据未用于浏览器测试。
 
 **GitHub 同步：**用户要求按现有文件更新仓库。先 `git fetch origin main` 确认远端与本地基线无分歧；再次运行完整 97 项回归、`git diff --check` 均退出码 0。按明确的 14 文件名单暂存，新增内容的私钥、令牌及运行密钥模式扫描无命中；未暂存本机数据。页面更新提交 `812670cfe741180dfdca33c300b60f9daf53218e` 已推送到 `yangxufe/SHIJINQIYONG` 的 `main`。随后从 GitHub 浅克隆到被忽略的 `work/github-latest-check/`，取得同一提交和新增的搜索脚本、结果模板及测试；`git ls-remote` 指向同一提交。仓库跟踪 159 个文件，路径审计未发现数据库、运行配置、私钥、日志或交付包。没有使用另一位协作者账号测试其权限；Mac 实机运行与 Android 证书信任仍待现场验证。
+
+## Windows 启动教程（2026-09-27）
+
+新增 `docs/WINDOWS.md`，将原主机已安装后的启动与另一台 Windows 新安装分开说明。新安装从 GitHub 克隆到本机非同步目录，创建独立虚拟环境、私有 SQLite/账号/证书；明确指出现有 `initialize_runtime.ps1` 带原主机 IP 和静态目录默认值，须在启动前改为新机实际地址。新增 `config/Caddyfile.windows`，按明确的家庭 IP/CIDR 绑定和限制访问，仍只代理本机 Waitress；README 链接新教程并修正“今天”页过时说明。无数据库迁移、生产密钥/证书改动或新依赖。
+
+**实际检查：**现有仓库基线干净；本机 Python 为 3.10.20、SQLite 3.53.2，已安装 Caddy 2.11.4。以合成 `192.168.1.50/24` 和被忽略的 `work/` 临时目录，运行 Caddy `adapt --validate` 退出码 0；有原配置沿用的代理头冗余提示，但不影响解析。PowerShell 中清除 `SHIJIN_*` 环境变量的教程命令在合成变量上返回 `env_cleanup_ok=True`；教程的 `icacls` 权限语法在临时目录退出码 0。完整 Django 回归 97 项通过、迁移检查无差异、`git diff --check` 退出码 0。官方 Python/Caddy/Microsoft 文档链接已核对。未在另一台 Windows、Android 或新 CA 上进行完整安装和联网验收；防火墙创建、根证书安装及可信 Wi-Fi 选择须在目标机器由使用者实际完成。后续入口：按教程在独立 Windows 机器试装并记录安装、无警告 HTTPS 与手机访问结果。
