@@ -237,7 +237,8 @@ async function committed(form, state) {
 
 for (const form of document.querySelectorAll("[data-inventory-form]")) bindForm(form);
 
-const photoInput = document.querySelector("#food-photo");
+const photoInputs = [...document.querySelectorAll("#food-camera, #food-album")];
+const photoButtons = [...document.querySelectorAll("[data-photo-input]")];
 const photoState = document.querySelector("#photo-state");
 const createForm = document.querySelector('form[data-inventory-kind="create"]');
 
@@ -269,42 +270,66 @@ async function photoAsJpeg(file) {
   return jpeg;
 }
 
-if (photoInput && photoState && createForm) {
-  photoInput.addEventListener("change", async () => {
+for (const button of photoButtons) {
+  button.addEventListener("click", () => document.getElementById(button.dataset.photoInput)?.click());
+}
+
+if (photoInputs.length && photoState && createForm) {
+  const candidates = document.createElement("div");
+  candidates.className = "photo-candidates";
+  candidates.setAttribute("aria-label", "确认识别结果");
+  photoState.after(candidates);
+  for (const photoInput of photoInputs) photoInput.addEventListener("change", async () => {
     const file = photoInput.files?.[0];
     if (!file) return;
     const requestId = createForm.elements.request_id.value;
     const originalName = createForm.elements.ingredient_name.value;
-    photoInput.disabled = true;
-    photoState.textContent = "正在本机识别照片…";
+    for (const control of [...photoButtons, ...photoInputs]) control.disabled = true;
+    candidates.replaceChildren();
+    photoState.textContent = "正在本机用 YOLO 检测…";
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
     try {
       const image = await photoAsJpeg(file);
       const csrf = createForm.querySelector('input[name="csrfmiddlewaretoken"]').value;
       const response = await fetch(createForm.dataset.photoUrl, {
-        method: "POST", credentials: "same-origin", cache: "no-store",
+        method: "POST", credentials: "same-origin", cache: "no-store", signal: controller.signal,
         headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
         body: JSON.stringify({ image }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error?.message || "识别失败，请重试或手动填写名称。");
       if (createForm.elements.request_id.value !== requestId) return;
-      if (data.ingredient_name) {
-        if (createForm.elements.ingredient_name.value === originalName) {
-          createForm.elements.ingredient_name.value = data.ingredient_name;
-          photoState.textContent = `${data.uncertain ? "可能是" : "识别为"}“${data.ingredient_name}”。请核对名称，填写实际数量后再保存。`;
-        } else {
-          photoState.textContent = `识别建议是“${data.ingredient_name}”。你已手动修改名称，未覆盖。`;
+      if (data.candidates?.length) {
+        photoState.textContent = "检测到以下候选。点击确认食材名称，再填写真实数量；检测分数不代表食品安全。";
+        for (const candidate of data.candidates) {
+          const button = element("button", `确认 ${candidate.ingredient_name}（检测分数 ${Math.round(candidate.confidence * 100)}%）`, "secondary-button");
+          button.type = "button";
+          button.addEventListener("click", () => {
+            if (createForm.elements.request_id.value !== requestId) return;
+            if (createForm.elements.ingredient_name.value !== originalName) {
+              photoState.textContent = "你已手动修改名称，未覆盖；请自行核对。";
+              candidates.replaceChildren();
+              return;
+            }
+            createForm.elements.ingredient_name.value = candidate.ingredient_name;
+            photoState.textContent = `已确认“${candidate.ingredient_name}”。请填写实际数量后保存。`;
+            candidates.replaceChildren();
+          });
+          candidates.append(button);
         }
       } else {
-        photoState.textContent = "没有认出食材。请拍清楚一件食材或包装文字，也可以手动填写。";
+        photoState.textContent = "没有检测到可确认的食材。请重拍清晰实物，也可以手动填写；YOLO 不读取包装文字。";
       }
     } catch (error) {
-      if (createForm.elements.request_id.value === requestId) photoState.textContent = error.message || "识别失败，请手动填写名称。";
+      if (createForm.elements.request_id.value === requestId) photoState.textContent = error.name === "AbortError" ? "检测超时，请稍后重试或手动填写。" : error.message || "识别失败，请手动填写名称。";
     } finally {
+      clearTimeout(timer);
       photoInput.value = "";
-      photoInput.disabled = false;
+      for (const control of [...photoButtons, ...photoInputs]) control.disabled = false;
     }
   });
+  createForm.addEventListener("reset", () => { candidates.replaceChildren(); photoState.textContent = ""; });
 }
 
 if (page && searchForm && queryInput && searchState) {

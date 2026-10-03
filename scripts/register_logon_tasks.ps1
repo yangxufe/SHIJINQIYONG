@@ -7,8 +7,7 @@ $trigger = New-ScheduledTaskTrigger -AtLogOn -User $identity
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Seconds 0) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew
 
 foreach ($entry in @(
-    @{ Name = 'ShiJinQiYong-Waitress'; Script = 'start_waitress.ps1' },
-    @{ Name = 'ShiJinQiYong-Ollama'; Script = 'start_ollama.ps1' }
+    @{ Name = 'ShiJinQiYong-Waitress'; Script = 'start_waitress.ps1' }
 )) {
     if (Get-ScheduledTask -TaskName $entry.Name -ErrorAction SilentlyContinue) {
         throw "计划任务 $($entry.Name) 已存在；请先核对，不覆盖。"

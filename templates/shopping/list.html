@@ -3,6 +3,7 @@
 <html lang="zh-Hans">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>采购 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
 <body><main class="page app-page inventory-page">
+{% include 'core/header_actions.html' %}
   <p class="eyebrow"><a href="{% url 'index' %}">食尽其用</a> / 采购</p>
   <h1>采购清单</h1>
   <p>先核对冰箱和清单，避免买重。买到后先标记，放入冰箱时再按实际数量入库。</p>

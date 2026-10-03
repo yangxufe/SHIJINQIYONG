@@ -9,11 +9,20 @@
 </head>
 <body>
   <main class="page">
+{% include 'core/header_actions.html' %}
     <p class="eyebrow">食尽其用</p>
     <h1>家庭设置</h1>
-    <p>设置数据表已建立。配置操作将在后续阶段开放。</p>
+    {% if household %}<p>{{ household.display_name }} · {{ household.time_zone }}</p>{% endif %}
+    <p><a href="{% url 'personal_taste' %}">我的口味配置</a></p>
+    {% if request.user.member_role.role == 'admin' %}
+    <p><a href="{% url 'household_taste' %}">家庭默认口味</a></p>
+    <section class="panel"><h2>邀请家庭成员</h2><p class="small-note">生成一次性邀请码，交给你允许加入家庭的成员。新账号仅有成员权限。</p>
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      <form method="post">{% csrf_token %}<input type="hidden" name="create_invitation" value="yes"><button type="submit">生成家庭邀请码</button></form>
+      {% if invitation_token %}<label for="invitation-token">邀请码（24 小时内有效，用后失效）</label><textarea id="invitation-token" rows="4" readonly>{{ invitation_token }}</textarea><p class="small-note">成员在登录首页的“注册”页面填写此码。</p>{% endif %}
+    </section>
+    {% else %}<p class="small-note">家庭默认口味及成员邀请由管理员维护。</p>{% endif %}
     <p><a href="{% url 'index' %}">返回首页</a></p>
-    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">退出登录</button></form>
   </main>
 </body>
 </html>

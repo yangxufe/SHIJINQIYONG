@@ -1,3 +1,33 @@
+# 2026-10-03 现行补充
+
+首次优化代码与兼容 core.0002 迁移已执行，原数据与迁移前私有备份逐行核对不变。YOLO 已构建/安装本机，使用说明见 [YOLO.md](YOLO.md)，不需要视觉 Ollama。复制安装模型时与原数据相互独立。
+
+2026-10-03 恢复会话权限后已修复并实际验证 Waitress 重启。原计划任务停止会留下 Windows venv 基础解释器子进程，旧代码曾继续返回 500；停止脚本现核对本项目解释器、Waitress 模块、父子关系和进程创建时间，清空 8000 后再启动任务。loopback 的 /health/、/welcome/、/login/、/register/ 为 200，匿名库存和菜谱 API 为 401；这是本机代理诊断，不是手机 HTTPS 验收。Caddy 服务仍停止，本轮未启动局域网入口、未改网段、CA 或防火墙。下面旧日期的启动状态与旧 IP 是历史记录。
+
+代码更新后的重启请使用以下步骤。停止脚本必须成功并确认 8000 不再监听后才能更新/备份；不能只依据任务状态或提前启动：
+
+```powershell
+& scripts/stop_waitress_for_backup.ps1
+# 此处按 WINDOWS.md / YOLO.md 更新、迁移、收集静态文件。
+Start-ScheduledTask -TaskName ShiJinQiYong-Waitress
+```
+
+若需手机访问，在已确认可信 Wi-Fi 下按 WINDOWS.md 启动 Caddy，并用已信任的公开根证书检查 HTTPS health。手机无警告信任仍未验收，不要越过证书警告输入密码。最新停机后私有备份为 household-20261003-182858-848124d8，附件 0 个，未上传。
+
+## 更新与回退
+
+1. 先按既有流程停止 Waitress，并 backup_household；本輪迁移前备份 household-20261003-120320-1c2099e8 位于受保护 data/backups，已核验完整性，未上传。
+2. 更新源码后安装 requirements.lock、执行 migrate、collectstatic、安装 YOLO；见 WINDOWS.md/MACOS.md/YOLO.md。保持原 runtime.env、SQLite、家庭附件和 CA，不重新初始化。
+3. Git 代码基线为 c524328，本机回退标记 rollback-before-first-optimization-20261003。core.0002 只建邀请表，回退旧代码无需删除它，原账户/库存/采购/菜谱兼容；注册产生的新成员仍为旧版支持的 MemberRole。
+4. 若确需撤销邀请注册，停止服务后可在核对注册期间数据及备份后迁移 core 到 0001，但该操作会删除邀请记录，不能盲目执行或连带清空原家庭数据。若恢复迁移前全库，会丢失备份后真实变更，需人工确认。
+5. 模型文件可重新从仓库校验安装；自定义旧模型安装脚本拒绝覆盖。切换模型前停应用、保存旧模型与清单。不要为了模型回退恢复旧库存数据库。
+
+## GitHub 交付状态
+
+先前会话的 .git 只读与网络限制已由用户解除。Git CLI fetch 已成功，远端 main 与优化前基线 c524328 一致；本轮通过 CLI 按明确文件清单提交和推送，不依赖此前返回 404 的 GitHub 应用连接。最终远端核对结果记录在 PROGRESS.md。data/、.venv、work、outputs、运行密钥、照片和私有备份不进入 GitHub。
+
+---
+
 # 食尽其用：家庭运行交接
 
 更新：2026-09-26。**现行入口 `https://192.168.110.146:8443/`**，在此前确认的家庭 Wi-Fi 上由 Caddy 开放；Android 仍有证书警告，不能算安全登录验收。下方阶段 07 旧地址说明保留为历史记录，当前运行与阶段 07A 步骤以文末补充为准。实际检查与未完成项见 `PROGRESS.md`。

@@ -1,18 +1,23 @@
 {% load static %}
 <!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>菜谱工作台 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
 <body><main class="page app-page">
+{% include 'core/header_actions.html' %}
   <p class="eyebrow"><a href="{% url 'recipes_page' %}">做什么</a> / 菜谱工作台</p>
-  <h1>{% if confirmed %}确认本餐条件{% else %}这餐想怎么吃？{% endif %}</h1>
-  <p class="small-note">可以写一句需求，也可以直接选择条件。自然语言只提取明确写出的少量信息；请在下一步逐项确认。高碳水与少添加糖是两个不同方向，均不等于低碳水。</p>
-  {% if confirmed %}<section class="panel"><h2>请核对理解结果</h2>
+  <h1>{% if direct %}填写菜谱要求{% elif confirmed %}确认本餐条件{% else %}这餐想怎么吃？{% endif %}</h1>
+  <p class="small-note">{% if direct %}请逐项确认下列条件，提交后直接开始生成；服务未配置时显示本地匹配结果。{% else %}可以写一句需求，也可以直接选择条件。自然语言只提取明确写出的少量信息；请在下一步逐项确认。{% endif %}高碳水与少添加糖是两个不同方向，均不等于低碳水。</p>
+  {% if confirmed and not direct %}<section class="panel"><h2>请核对理解结果</h2>
     <p>识别出的营养方向：{% for goal in parsed.goals %}{{ goal }} {% empty %}无明确方向{% endfor %}。未识别的原话仍保留在下方，系统不会自行补设饮食目标。</p>
     <p class="small-note">过敏、禁食、严格库存、器材和明确时间限制属于硬条件；若无可行菜谱，会显示无匹配，不自动放宽。</p>
   </section>{% endif %}
-  <form method="post" action="{% if confirmed %}{% url 'workbench_confirm' %}{% else %}{% url 'workbench_page' %}{% endif %}" class="panel">
+  <form method="post" action="{% if confirmed or direct %}{% url 'workbench_confirm' %}{% else %}{% url 'workbench_page' %}{% endif %}" class="panel">
     {% csrf_token %}{{ form.request_id }}
     {% if form.non_field_errors %}<div class="error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-    {% for field in form.visible_fields %}<div class="form-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="small-note">{{ field.help_text }}</p>{% endif %}{% if field.errors %}<p class="error">{{ field.errors }}</p>{% endif %}</div>{% endfor %}
-    <button type="submit">{% if confirmed %}确认条件并查看候选{% else %}解释条件{% endif %}</button>
+    {% for field in form.visible_fields %}{% if not direct or field.name != 'raw_text' %}<div class="form-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="small-note">{{ field.help_text }}</p>{% endif %}{% if field.errors %}<p class="error">{{ field.errors }}</p>{% endif %}</div>{% endif %}{% endfor %}
+    {% if direct %}<input type="hidden" name="generate" value="yes">
+      {% if configured_provider == 'openai' %}<label class="shopping-check"><input type="checkbox" name="external_consent" required>同意将本次条件与必要食材名称、数量发送给管理员配置的外部模型；不发送账号、Cookie 或整库。</label>{% endif %}
+    {% endif %}
+    <button type="submit">{% if direct %}生成个性化菜谱{% elif confirmed %}确认条件并查看候选{% else %}解释条件{% endif %}</button>
   </form>
   <p class="small-note">查看候选、生成或收藏不会扣库存，也不会自动加入采购。</p>
+  <p><a href="{% url 'recipes_page' %}">返回做什么</a></p>
 </main>{% include 'core/nav.html' with active_tab='recipes' %}</body></html>

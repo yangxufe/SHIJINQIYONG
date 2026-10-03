@@ -35,13 +35,23 @@ def _json_digest(payload):
     return hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def _provider_kind():
+    try:
+        return provider_configuration()[0]
+    except GenerationUnavailable:
+        return ""
+
+
 @require_http_methods(["GET", "POST"])
 def workbench_page(request):
     if request.method == "GET":
         text = request.GET.get("raw_text", "")[:600]
         form = RecipeConditionsForm(initial={"request_id": uuid4(), "people": 2, "max_minutes": 30,
                                               "spice_max": 1, "raw_text": text})
-        return render(request, "meals/workbench.html", {"form": form, "confirmed": False})
+        direct = request.GET.get("direct") == "1"
+        provider = _provider_kind() if direct else ""
+        return render(request, "meals/workbench.html", {"form": form, "confirmed": False,
+                      "direct": direct, "configured_provider": provider})
     if any(len(request.POST.getlist(key)) != 1 for key in request.POST if key not in {"goals", "equipment"}):
         return _error(request, "条件表单包含重复字段。")
     form = RecipeConditionsForm(request.POST)
@@ -58,7 +68,9 @@ def confirm_conditions(request):
         return _error(request, "条件表单包含重复字段。")
     form = RecipeConditionsForm(request.POST)
     if not form.is_valid():
-        return render(request, "meals/workbench.html", {"form": form, "confirmed": True}, status=422)
+        return render(request, "meals/workbench.html", {"form": form, "confirmed": True,
+                      "direct": request.POST.get("generate") == "yes",
+                      "configured_provider": _provider_kind()}, status=422)
     conditions = form.cleaned_data["conditions"]
     request_id = form.cleaned_data["request_id"]
     digest = _json_digest(conditions)
@@ -78,6 +90,16 @@ def confirm_conditions(request):
         if stock._is_busy(exc):
             return _error(request, "数据库暂时繁忙，请用原页面重试。", 503)
         raise
+    if request.POST.get("generate") == "yes":
+        try:
+            task = queue_generation(request.user, plan, str(uuid5(plan.request_id, "direct-generation")),
+                                    external_consent=request.POST.get("external_consent") == "on")
+        except GenerationUnavailable as exc:
+            messages.warning(request, "生成服务未配置或暂不可用，已改为本地菜谱匹配。错误代码：" + exc.code)
+        except stock.InventoryError as exc:
+            return _error(request, exc.message, exc.status)
+        else:
+            return redirect("generation_detail", task_id=task.pk)
     return redirect("workbench_results", plan_id=plan.pk)
 
 

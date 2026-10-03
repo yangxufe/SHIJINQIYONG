@@ -50,7 +50,8 @@ class AuthSecurityTests(TestCase):
     def test_session_persists_and_member_cannot_read_settings(self):
         self.assertEqual(self.login().status_code, 302)
         self.assertEqual(self.client.get("/").status_code, 200)
-        self.assertEqual(self.client.get("/settings/").status_code, 403)
+        self.assertEqual(self.client.get("/settings/").status_code, 200)
+        self.assertEqual(self.client.post("/settings/", {"create_invitation": "yes"}).status_code, 403)
         denied = self.client.get("/api/settings/")
         self.assertEqual(denied.status_code, 403)
         self.assertEqual(denied.json()["error"]["code"], "forbidden")

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "model": "yolov8s-worldv2",
+  "classes": [
+    {
+      "prompt": "tomato",
+      "name": "番茄"
+    },
+    {
+      "prompt": "chinese cabbage",
+      "name": "白菜"
+    },
+    {
+      "prompt": "cabbage",
+      "name": "包菜"
+    },
+    {
+      "prompt": "bok choy",
+      "name": "青菜"
+    },
+    {
+      "prompt": "spinach",
+      "name": "菠菜"
+    },
+    {
+      "prompt": "broccoli",
+      "name": "西兰花"
+    },
+    {
+      "prompt": "carrot",
+      "name": "胡萝卜"
+    },
+    {
+      "prompt": "potato",
+      "name": "土豆"
+    },
+    {
+      "prompt": "sweet potato",
+      "name": "红薯"
+    },
+    {
+      "prompt": "onion",
+      "name": "洋葱"
+    },
+    {
+      "prompt": "green onion",
+      "name": "葱"
+    },
+    {
+      "prompt": "garlic",
+      "name": "大蒜"
+    },
+    {
+      "prompt": "ginger",
+      "name": "姜"
+    },
+    {
+      "prompt": "cucumber",
+      "name": "黄瓜"
+    },
+    {
+      "prompt": "bell pepper",
+      "name": "甜椒"
+    },
+    {
+      "prompt": "eggplant",
+      "name": "茄子"
+    },
+    {
+      "prompt": "corn",
+      "name": "玉米"
+    },
+    {
+      "prompt": "mushroom",
+      "name": "蘑菇"
+    },
+    {
+      "prompt": "tofu",
+      "name": "豆腐"
+    },
+    {
+      "prompt": "egg",
+      "name": "鸡蛋"
+    },
+    {
+      "prompt": "raw chicken meat",
+      "name": "鸡肉"
+    },
+    {
+      "prompt": "raw beef meat",
+      "name": "牛肉"
+    },
+    {
+      "prompt": "raw pork meat",
+      "name": "猪肉"
+    },
+    {
+      "prompt": "fish",
+      "name": "鱼"
+    },
+    {
+      "prompt": "shrimp",
+      "name": "虾"
+    },
+    {
+      "prompt": "banana",
+      "name": "香蕉"
+    },
+    {
+      "prompt": "apple",
+      "name": "苹果"
+    },
+    {
+      "prompt": "orange fruit",
+      "name": "橙子"
+    },
+    {
+      "prompt": "pear",
+      "name": "梨"
+    },
+    {
+      "prompt": "grapes",
+      "name": "葡萄"
+    },
+    {
+      "prompt": "peach",
+      "name": "桃"
+    },
+    {
+      "prompt": "lemon",
+      "name": "柠檬"
+    }
+  ],
+  "sha256": "bb695271871958cd380ff911888aeed8867ceb24071933efc26b337639e78f41",
+  "weights_source": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8s-worldv2.pt",
+  "license": "AGPL-3.0",
+  "weights_sha256": "9b2c17ab6124a913e9b3a5c170617920d91b0f01111a8479da69f00e2cf27792"
+}

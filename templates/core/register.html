@@ -1,0 +1,12 @@
+{% load static %}
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>注册 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page">
+  <p class="brand-script">食尽其用</p><h1>注册</h1>
+  <p class="small-note">向家庭管理员获取一次性邀请码，再创建自己的成员账号。邀请码有效期为 24 小时。</p>
+  <form method="post" action="{% url 'register' %}" class="login-form">
+    {% csrf_token %}{{ form.non_field_errors }}
+    {% for field in form %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}{% if field.help_text %}<div class="small-note">{{ field.help_text }}</div>{% endif %}{% endfor %}
+    <button type="submit">注册</button>
+  </form>
+  <p><a href="{% url 'login' %}">已有账号，去登录</a> · <a href="{% url 'welcome' %}">返回首页</a></p>
+</main></body></html>

@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>口味配置 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
-<body><main class="page app-page"><p class="eyebrow"><a href="{% url 'workbench_page' %}">菜谱工作台</a> / 口味配置</p><h1>{% if household %}家庭默认口味{% else %}我的口味{% endif %}</h1>
+<body><main class="page app-page">
+{% include 'core/header_actions.html' %}<p class="eyebrow"><a href="{% url 'workbench_page' %}">菜谱工作台</a> / 口味配置</p><h1>{% if household %}家庭默认口味{% else %}我的口味{% endif %}</h1>
   {% for message in messages %}<p class="notice">{{ message }}</p>{% endfor %}
   <p class="small-note">“不喜欢”和“过敏/禁食”分开保存。没做过某菜系不等于不喜欢；本次尝新不会自动改写长期偏好。只有本人可以修改个人配置；其他成员只有在你明确授权分享时，才会在共同用餐中合并你的过敏和禁食限制。</p>
   <form method="post" class="panel">{% csrf_token %}{{ form.version }}{% if form.non_field_errors %}<p class="error">{{ form.non_field_errors }}</p>{% endif %}

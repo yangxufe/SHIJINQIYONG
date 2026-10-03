@@ -33,15 +33,16 @@ def _detail_context(recipe, request_id, draft):
 
 
 @require_GET
-def recipe_list(request):
+def recipe_list(request, library=False):
     if "find" in request.GET:
         return redirect(f"{reverse('recipe_search_results')}?{request.GET.urlencode()}")
     category = request.GET.get("category", "").strip()
     query = request.GET.get("q", "").strip()
     try:
-        context = services.list_recipes(request.user, category=category, query=query)
+        context = services.list_recipes(request.user, category=category, query=query, matched_only=not library)
     except inventory_service.InventoryError as exc:
         return render(request, "inventory/error.html", {"error": exc.message}, status=exc.status)
+    context["library"] = library
     return render(request, "meals/list.html", context)
 
 
@@ -66,7 +67,7 @@ def recipe_search_results(request):
 @require_GET
 def recipe_list_api(request):
     try:
-        result = services.list_recipes(request.user, category=request.GET.get("category", "").strip(), query=request.GET.get("q", "").strip())
+        result = services.list_recipes(request.user, category=request.GET.get("category", "").strip(), query=request.GET.get("q", "").strip(), matched_only=True)
     except inventory_service.InventoryError as exc:
         return _error_response(exc)
     return JsonResponse(result)

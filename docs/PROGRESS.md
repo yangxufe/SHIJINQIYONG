@@ -472,3 +472,35 @@
 新增 `docs/WINDOWS.md`，将原主机已安装后的启动与另一台 Windows 新安装分开说明。新安装从 GitHub 克隆到本机非同步目录，创建独立虚拟环境、私有 SQLite/账号/证书；明确指出现有 `initialize_runtime.ps1` 带原主机 IP 和静态目录默认值，须在启动前改为新机实际地址。新增 `config/Caddyfile.windows`，按明确的家庭 IP/CIDR 绑定和限制访问，仍只代理本机 Waitress；README 链接新教程并修正“今天”页过时说明。无数据库迁移、生产密钥/证书改动或新依赖。
 
 **实际检查：**现有仓库基线干净；本机 Python 为 3.10.20、SQLite 3.53.2，已安装 Caddy 2.11.4。以合成 `192.168.1.50/24` 和被忽略的 `work/` 临时目录，运行 Caddy `adapt --validate` 退出码 0；有原配置沿用的代理头冗余提示，但不影响解析。PowerShell 中清除 `SHIJIN_*` 环境变量的教程命令在合成变量上返回 `env_cleanup_ok=True`；教程的 `icacls` 权限语法在临时目录退出码 0。完整 Django 回归 97 项通过、迁移检查无差异、`git diff --check` 退出码 0。官方 Python/Caddy/Microsoft 文档链接已核对。未在另一台 Windows、Android 或新 CA 上进行完整安装和联网验收；防火墙创建、根证书安装及可信 Wi-Fi 选择须在目标机器由使用者实际完成。后续入口：按教程在独立 Windows 机器试装并记录安装、无警告 HTTPS 与手机访问结果。
+
+## 第一次优化与 YOLO 替换（2026-10-03）
+
+按用户所附 6 项 DOCX 清单实施；清单无图片。ECC 为方案目录，实际修改现有程序仓库，基线干净且远端 origin/main 与 c524328 一致。使用通用 docx-cn/brainstorming/Browser 技能，无数学建模技能或分代理。修改前创建本机 Git 回退 tag，并按 stop_waitress → backup_household → 恢复任务的流程保存私有备份 household-20261003-120320-1c2099e8，未上传。
+
+**已实现：**欢迎页系统花体/楷体回退标题、登录和 Django 邀请注册；管理员 24 小时一次性签名邀请码及只创建普通成员；今天固定“添加菜品”连接原录入；所有应用页右上角小字无下划线家庭设置和 CSRF POST 退出；隐藏文件输入与拍照/相册独立按钮、非按钮区域不触发；主菜谱页删除原需求整栏、填写条件后直接幂等生成任务/无模型真实本地降级；无真实合格库存匹配时不显示匹配菜谱，新增独立收藏浏览入口保留原 ID/详情/上传引用。
+
+**食品识别：**inventory/recognition.py 移除 qwen3-vl:8b 和 Ollama 网络调用，真实导出官方 YOLO-World v2 32 类固定词表 ONNX；生产仅 onnxruntime 1.23.2/numpy 2.2.6 CPU 两线程单槽，无视觉大模型回退。模型形状、类序、SHA-256 核验、NMS、阈值、无结果和缺模型处理；照片去元数据且不存盘，候选须点击确认，只填名字不推断数量/日期/安全。仓库 model_assets 包含公开模型 51,287,685 字节、来源/散列/类序与 AGPL 全文；模型构建和安装脚本可复用，构建用的 PyTorch/CLIP 临时环境不提交。YOLO 不提供包装 OCR，遮挡/相似肉类仍可能漏检或误认；没有声称 32 类全部准确。
+
+**改动位置：**core 模型/注册表单/权限入口与 core.0002 兼容迁移；config/urls、meals 列表与工作台入口；模板公共账号片段、欢迎/注册页、今天/冰箱/菜谱及各业务页；原生 CSS/JS；YOLO 配置/构建/安装/公开资产；requirements.lock 与 Windows/Mac 运行加载/任务脚本；回归测试及 AGENTS、ARCHITECTURE、API、SECURITY、PERFORMANCE、HANDOFF、ACCEPTANCE、SOURCES、Windows/Mac/YOLO 文档。未重建项目、未改库存事务服务、未重置账号。
+
+**迁移与生产静态：**manage_prod.ps1 migrate --noinput 执行 core.0002 成功；collectstatic 复制 2 文件、后处理 6，退出码 0；check --deploy 退出码 0，仅既有 IP HSTS security.W004。迁移后 9 表与迁移前备份逐行一致：账号 2、角色 2、食材 1、批次 1、动作 2、流水 1、购物/家庭菜谱 0、营养 14；完整性 ok，外键问题 0，新邀请 0。
+
+**实际自动化：**`manage.py test tests --settings=config.settings.test --noinput` 最终 106 项通过，15.757 秒，退出码 0，包含原真实文件库事务/幂等/并发及新邀请/匹配/直接生成/照片安全与 YOLO 安装检查。首轮 104 项 1 项错误为新增测试错引 task.conditions，修正为 recipe_request.conditions 后复跑通过，未跳过测试。`makemigrations --check --dry-run` 无差异、`pip check` 无冲突、`git diff --check` 退出码 0。测试替身用于模型 API 合同，不冒充真实识别准确率。
+
+**实际模型与浏览器：**空白图无候选；4 张公开 COCO 图有 2 张检出西兰花、2 张未检出，其中一张还返回需人工核对的橙子候选，所有结果在 YOLO.md 如实记录。浏览器相册上传公开图实际 YOLO 候选、确认前名称为空，确认后实际数量仍空且库存 0；拍照按钮另触发选择器，普通区域点击未触发。注册返回登录、收藏浏览、直接生成的本地降级已实际点击；320/390/1280 CSS 像素下 4 个主要页面无横向溢出，账号操作不遮挡标题且无下划线。outputs/first-optimization-today.png 为实际隔离页面截图。不是 Android 实机。
+
+**真实并行测量：**12 次真实 YOLO CPU 推理同时进行 30 次库存读取/30 次创建，全 30 轮重叠，无错误；读 p95 27.5 ms、写 p95 23.6 ms、YOLO p95 362.9 ms。首次加载 1.8–2.0 秒。使用隔离文件库与 Django test Client，不冒充家庭 HTTPS 或手机指标，见 PERFORMANCE。
+
+**未完成/阻断：**末次检查 Caddy 为停止，Waitress 任务 Running；没有完成新的 Caddy/Android 信任/手机相机/真实 Mac 测试，未改网络、CA 与防火墙。真实菜谱生成模型未联调，生产 provider 默认关闭，直接生成使用明确本地降级。第 2 项写明“具体内容后续确定”，本轮只连接已有录入。
+
+交付末尾会话权限改为 managed：.git 只读，联网受限。GitHub 应用 get_repo 和 main ref 请求返回 404。未绕过权限、未伪造提交/推送；**GitHub 同步尚未完成**。本轮完整源码包/同步清单会保存在被忽略的 outputs，待恢复本项目 Git 写入与网络权限，或当前 GitHub 连接获仓库访问后继续。下一步提示词：恢复权限后发送“继续同步本轮优化到 GitHub”，再按 YOLO.md/WINDOWS.md 在手机和 Mac 验收。
+
+## 第一次优化同步续办（2026-10-03）
+
+用户恢复权限并明确要求继续同步。核对本轮 67 文件清单与原散列，远端 fetch 成功，HEAD 与 origin/main 同为 c524328；未覆盖其他用户改动。前次受限会话无法写入的末次运行状态现并入本节，旧源码包的补充文档补丁无需再单独应用。
+
+**运行修复与失败记录：**原 Waitress 匿名健康、欢迎、登录、注册及 API 均返回 500。仅 Stop/Start-ScheduledTask 未清理旧解释器；首次停止检查中提前启动导致停止验收失败，随后按顺序再停，旧辅助脚本仍未清空监听；这两次均未据此运行备份。确认本项目 Windows venv 启动器和基础解释器的 Waitress 父子进程后，修复 stop_waitress_for_backup.ps1：在停止任务前记录白名单解释器/模块/父子进程，结束时复核创建时间以防 PID 复用，不停止未知端口程序。修复后脚本退出码 0 且 8000 清空；backup_household 退出码 0，生成私有 household-20261003-182858-848124d8（0 附件）。再启动任务并通过 loopback 代理头诊断：health/welcome/login/register 200、health=ok，匿名 inventory/recipes API 401，探测退出码 0；旧进程 500 已解除。check --deploy 退出码 0，仅原 security.W004。Caddy 仍停止，未启动新 LAN 入口，未放宽安全设置。
+
+**本轮复测：**完整 106 项回归再次通过，15.693 秒、退出码 0；包括原真实文件 SQLite 并发、库存事务/幂等和新邀请/YOLO/页面测试。停止脚本的新进程处理在本机计划任务与真实 Python 父子进程上执行验证，不以模拟断言代替。YOLO 公开样本与隔离页面的此前实测记录继续有效；Android 相机/无警告 HTTPS、Mac 实机、真实菜谱生成模型仍未验收。
+
+**同步准备：**新增一项必要的停止脚本修复，共 68 个本轮文件；提交前检查路径、令牌/私钥模式、模型来源和 SHA-256，正式推送与远端核对结果在完成后追加。不上传私有数据库、运行环境、备份、媒体、Cookie、日志、CA 私钥或临时构建文件。

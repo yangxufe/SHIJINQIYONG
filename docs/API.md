@@ -128,3 +128,11 @@ JSON 写请求必须使用 `Content-Type: application/json`，并从页面隐藏
 ## 错误合同
 
 API 错误格式：`{"error":{"code":"机器码","message":"中文说明"}}`。已实现 400 JSON 格式/媒体类型错误、401 未登录、403 无权限/CSRF、404 批次或动作不存在、405 方法不符、409 状态/数量/版本/幂等冲突、422 参数校验、429 登录节流、503 **已确认的**短暂 SQLite 忙（`Retry-After: 2`）、501 预留功能未开放。其他数据库故障仍是脱敏 500，不能误报 503；所有动态响应 `Cache-Control: no-store`。CSRF 拒绝在 API 返回 JSON，在网页返回中文错误页。
+
+## 第一次优化接口变更（2026-10-03）
+
+- 未登录 `GET /` 跳转 `/welcome/`，欢迎页提供 `/login/` 与 `/register/`。`POST /register/` 使用 Django UserCreationForm 的 username/password1/password2 与 invitation，需 CSRF、有效管理员邀请码及密码校验。成功在短事务创建普通成员并消费邀请后跳登录，绝不自动注册管理员；无效/已使用/过期邀请码 422。密码不回显、不记录普通日志。
+- `GET /settings/` 允许家庭成员查看入口与个人配置链接。仅管理员可 `POST create_invitation=yes`，返回当前页的一次性邀请码，24 小时有效，最多 20 个未过期邀请。邀请码只在该私有响应展示，不放 URL、共享缓存或普通日志。原 `/api/settings/` 管理员权限保留。
+- `GET /recipes/` 与 `/api/recipes/` 只包含真实可用库存 `matched_count > 0` 的菜谱。部分材料匹配不等于足量，必要用量仍待确认。`GET /recipes/library/` 保留有权访问的全部本地/家庭收藏浏览与原详情引用。
+- `GET /recipes/workbench/?direct=1` 显示“填写菜谱要求”；`POST /recipes/workbench/confirm/` 额外 `generate=yes` 直接确认条件并入队，成功跳任务页，不经过旧候选中间页；同一次条件 UUID 派生固定生成 UUID，刷新/重复提交不重复入队。外部模型仍须 external_consent=on；未配置时明确显示本地降级。旧自然语言解释与候选路由继续兼容。
+- `POST /api/inventory/recognize/` 原 image base64 JPEG/PNG/WebP 字段及登录/CSRF/解压上限保留。响应增加 `engine:"yolo"`、最多 10 个去重 candidates，每项 ingredient_name 与 confidence（检测分数）；兼容 ingredient_name，uncertain 始终 true，用户须确认。不写库存、不保存照片，不把物体个数当库存数量。YOLO 未安装、模型校验失败、单槽繁忙分别返回安全 503 代码 recognition_not_configured/recognition_model_invalid/recognition_busy。

@@ -53,7 +53,7 @@ def _catalog_matches(actor):
     return recipes, by_canonical, canonical_by_name
 
 
-def list_recipes(actor, *, category="", query=""):
+def list_recipes(actor, *, category="", query="", matched_only=False):
     if len(category) > 20 or len(query) > 80:
         raise inventory_service.InventoryError(422, "invalid_input", "筛选条件过长。")
     recipes, by_canonical, _ = _catalog_matches(actor)
@@ -65,6 +65,8 @@ def list_recipes(actor, *, category="", query=""):
         if query and not any(query.casefold() in value.casefold() for value in [recipe["name"], *recipe["tags"], *recipe["ingredients"]]):
             continue
         missing = [name for name in recipe["ingredients"] if not by_canonical.get(name)]
+        if matched_only and len(missing) == len(recipe["ingredients"]):
+            continue
         output.append({
             "id": recipe["id"], "name": recipe["name"],
             "ingredients": recipe["ingredients"], "missing": missing,

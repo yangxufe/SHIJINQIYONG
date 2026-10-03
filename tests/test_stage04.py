@@ -40,7 +40,7 @@ class TodayAndMobileTests(TestCase):
         self.assertContains(page, "计划日期是安排提醒，不是安全期限。")
         self.assertContains(page, 'aria-label="主要页面"')
         self.assertEqual(self.client.get("/api/today/", secure=True).json()["arrange"], [])
-        self.assertContains(self.client.get("/recipes/", secure=True), "番茄炒蛋")
+        self.assertNotContains(self.client.get("/recipes/", secure=True), "按食材匹配的菜谱")
         self.assertContains(self.client.get("/shopping/", secure=True), "清单还没有待办")
         self.assertEqual(self.client.get("/api/recipes/", secure=True).status_code, 200)
 

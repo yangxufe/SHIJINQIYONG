@@ -3,6 +3,7 @@ import io
 import json
 import re
 from unittest.mock import patch
+import numpy as np
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -35,32 +36,50 @@ class PhotoEntryTests(TestCase):
         token = re.search(rb'name="csrfmiddlewaretoken" value="([^"]+)"', page.content).group(1).decode()
         self.assertContains(page, 'capture="environment"')
         self.assertContains(page, "更多信息（日期、批次名、优先顺序）")
-        with patch("inventory.recognition._ask_local_model", return_value={"name": "番茄", "uncertain": False}) as model:
+        expected = {"ingredient_name": "番茄", "uncertain": True, "engine": "yolo",
+                    "candidates": [{"ingredient_name": "番茄", "confidence": .85}]}
+        with patch("inventory.recognition._detect", return_value=expected) as model:
             result = client.post("/api/inventory/recognize/", payload, content_type="application/json", secure=True, HTTP_ORIGIN="https://testserver", HTTP_X_CSRFTOKEN=token)
         self.assertEqual(result.status_code, 200)
-        self.assertEqual(result.json(), {"ingredient_name": "番茄", "uncertain": False})
+        self.assertEqual(result.json(), expected)
         self.assertTrue(model.call_args.args[0].startswith(b"\xff\xd8"))
         self.assertEqual(InventoryLot.objects.count(), 0)
         self.assertEqual(Movement.objects.count(), 0)
 
-    def test_bad_images_and_model_suggestions_are_rejected_or_marked_uncertain(self):
-        self.assertEqual(
-            recognition._parse_model_response(json.dumps({
-                "done": True, "message": {"content": "", "thinking": '{"name":"番茄","uncertain":false}'},
-            }).encode()),
-            {"name": "番茄", "uncertain": False},
-        )
+    def test_bad_images_and_yolo_predictions_are_rejected_or_marked_uncertain(self):
         with self.assertRaises(recognition.RecognitionError):
             recognition.recognise(base64.b64encode(b"not an image").decode())
         with self.assertRaises(recognition.RecognitionError):
             recognition.recognise("not base64")
-        with patch("inventory.recognition._ask_local_model", return_value={"name": "", "uncertain": False}):
-            self.assertEqual(recognition.recognise(test_photo()), {"ingredient_name": "", "uncertain": True})
-        with patch("inventory.recognition._ask_local_model", return_value={"name": "<script>", "uncertain": True}):
-            self.assertEqual(recognition.recognise(test_photo())["ingredient_name"], "<script>")
-        with patch("inventory.recognition._ask_local_model", return_value={"name": "甲" * 81, "uncertain": False}):
-            with self.assertRaises(recognition.RecognitionError):
+        output = np.zeros((1, 6, 8400), dtype=np.float32)
+        classes = [{"name": "番茄"}, {"name": "苹果"}]
+        transform = (100, 100, 6.4, 0, 0)
+        self.assertEqual(recognition._postprocess(output, classes, transform)["candidates"], [])
+        output[0, :, 0] = [320, 320, 100, 100, .85, .1]
+        output[0, :, 1] = [320, 320, 100, 100, .1, .8]
+        output[0, :, 2] = [100, 100, 90, 90, .1, .34]
+        result = recognition._postprocess(output, classes, transform)
+        self.assertEqual(len(result["candidates"]), 1)
+        self.assertEqual(result["ingredient_name"], "番茄")
+        self.assertTrue(result["uncertain"])
+        output[0, 0, 0] = np.nan
+        with self.assertRaises(ValueError):
+            recognition._postprocess(output, classes, transform)
+
+    def test_letterbox_and_busy_limit(self):
+        photo = recognition._normalise_photo(test_photo())
+        tensor, transform = recognition._preprocess(photo)
+        self.assertEqual(tensor.shape, (1, 3, 640, 640))
+        self.assertEqual(tensor.dtype, np.float32)
+        self.assertGreater(tensor[0, 0].mean(), .9)
+        self.assertEqual(transform, (100, 100, 6.4, 0, 0))
+        self.assertTrue(recognition._INFERENCE_SLOT.acquire(False))
+        try:
+            with self.assertRaises(recognition.RecognitionError) as error:
                 recognition.recognise(test_photo())
+            self.assertEqual(error.exception.code, "recognition_busy")
+        finally:
+            recognition._INFERENCE_SLOT.release()
 
     def test_minimal_manual_form_keeps_unverified_storage_out_of_today(self):
         self.client.force_login(self.user, backend="django.contrib.auth.backends.ModelBackend")

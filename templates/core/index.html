@@ -10,14 +10,15 @@
 <body>
 <main class="page app-page" id="today-page">
   <header class="app-header">
-    <div class="today-header-actions">
-      {% if request.user.member_role.role == "admin" %}<a href="{% url 'household_settings' %}">家庭设置</a>{% endif %}
-      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="text-button">退出登录</button></form>
-    </div>
+    {% include 'core/header_actions.html' %}
     <h1>今天先吃</h1>
     <p class="small-note">计划日期是安排提醒，不是安全期限。</p>
   </header>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  <section class="panel" aria-labelledby="today-add-heading">
+    <h2 id="today-add-heading">添加菜品</h2>
+    <a class="action-link" href="{% url 'inventory_page' %}#new-lot-heading">添加菜品或食材</a>
+  </section>
 </main>
 {% include 'core/nav.html' with active_tab='today' %}
 </body>

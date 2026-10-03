@@ -87,7 +87,11 @@ https://<Mac的当前家庭IPv4>:8443/
 
 ## 功能与数据边界
 
-- 本机拍照识别依赖另装并运行的本地 Ollama 与已下载视觉模型；没有它时手工录入可用。菜谱外部生成默认关闭，既不需要在线 AI 密钥，也不应把密钥提交到 GitHub。
+- 本机拍照识别使用随仓库提供的 YOLO ONNX；初始化后执行 `.venv/bin/python scripts/install_yolo_food.py`，步骤与限制见 [YOLO.md](YOLO.md)，无需启动视觉 Ollama。菜谱外部生成默认关闭，既不需要在线 AI 密钥，也不应把密钥提交到 GitHub。
 - Caddy 的 Windows 配置 `config/Caddyfile` 含原电脑地址；Mac 只使用 `config/Caddyfile.macos`。每台机器生成自己的 `data/runtime.env` 和 CA，不复用别人的密钥。
 - 要备份本机家庭记录，先停止 Waitress，再以 `.venv/bin/python scripts/macos_runtime.py manage backup_household` 备份数据库和附件，并把整个私有备份目录另存到受保护的位置。源码仓库不承担数据备份。
 - 本教程的脚本与 Caddy 配置在 Windows 开发机经过语法和自动化检查；**没有在真实 Mac 或另一台手机上执行安装、证书信任和访问验收**。遇到系统弹窗或浏览器证书问题请以实际设备结果为准。
+
+## 本轮更新及注册
+
+原有 Mac 停止 Waitress 后更新代码和 requirements.lock，执行兼容 migrate、collectstatic、`.venv/bin/python scripts/install_yolo_food.py` 后再启动；若自定义私有目录，安装命令追加 `--data-dir` 指向同一个目录。管理员在家庭设置生成 24 小时一次性邀请码，成员在欢迎页注册自己的普通账号。ONNX 模型随代码下载，不含任何真实家庭照片；此轮仍未在真实 Mac/Android 上验收。

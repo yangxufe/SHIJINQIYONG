@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>选定菜单 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
-<body><main class="page app-page"><p class="eyebrow"><a href="{% url 'workbench_results' menu.recipe_request.id %}">候选菜谱</a> / 选定菜单</p><h1>本餐菜单</h1>
+<body><main class="page app-page">
+{% include 'core/header_actions.html' %}<p class="eyebrow"><a href="{% url 'workbench_results' menu.recipe_request.id %}">候选菜谱</a> / 选定菜单</p><h1>本餐菜单</h1>
   <section class="panel"><h2>共同使用一份库存</h2><p>{% for spec in selected %}{{ spec.title }}{% if not forloop.last %}、{% endif %}{% endfor %} · {{ conditions.people }} 人</p>
     {% if menu.executed_action_id %}<p class="small-note">下列覆盖与缺口按执行后的当前库存重算，不能当作执行前的分配记录；实际流水见冰箱。</p>{% endif %}
     {% if result.blockers %}{% for blocker in result.blockers %}<p class="error">{{ blocker }}</p>{% endfor %}{% endif %}

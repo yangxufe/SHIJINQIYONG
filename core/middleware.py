@@ -6,17 +6,20 @@ from core.security import has_role
 
 
 class AuthenticationGateMiddleware:
-    """Deny every application URL except login, health and local static."""
+    """Gate household pages; public entry/registration still require an invitation to join."""
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path in {reverse("login"), reverse("health")}:
+        if request.path in {reverse("login"), reverse("health"), reverse("welcome"), reverse("register")}:
             return self.get_response(request)
         if not request.user.is_authenticated:
             if request.path.startswith("/api/"):
                 return JsonResponse({"error": {"code": "unauthenticated", "message": "请先登录。"}}, status=401)
+            if request.path == reverse("index"):
+                from django.shortcuts import redirect
+                return redirect("welcome")
             return redirect_to_login(request.get_full_path(), login_url=reverse("login"))
         if not (has_role(request.user, "admin") or has_role(request.user, "member")):
             if request.path.startswith("/api/"):

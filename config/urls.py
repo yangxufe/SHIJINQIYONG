@@ -7,11 +7,14 @@ from shopping import views as shopping_views
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("welcome/", views.welcome, name="welcome"),
+    path("register/", views.register, name="register"),
     path("health/", views.health, name="health"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("settings/", views.household_settings, name="household_settings"),
     path("recipes/", meals_views.recipe_list, name="recipes_page"),
+    path("recipes/library/", meals_views.recipe_list, {"library": True}, name="recipe_library"),
     path("recipes/search-results/", meals_views.recipe_search_results, name="recipe_search_results"),
     path("recipes/workbench/", workbench_views.workbench_page, name="workbench_page"),
     path("recipes/workbench/confirm/", workbench_views.confirm_conditions, name="workbench_confirm"),

@@ -9,6 +9,7 @@
 </head>
 <body>
 <main class="page app-page recipe-detail-page">
+{% include 'core/header_actions.html' %}
   <p class="eyebrow"><a href="{% url 'recipes_page' %}">做什么</a> / 菜谱</p>
   <h1>{{ recipe.name }}</h1>
   <p class="recipe-meta">{{ recipe.category }} · {{ recipe.source_label }}{% for tag in recipe.tags %} · #{{ tag }}{% endfor %}</p>

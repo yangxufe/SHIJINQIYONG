@@ -96,3 +96,18 @@ button:disabled { opacity: .7; cursor: progress; }
 .form-row ul label { display: flex; align-items: center; font-weight: 500; }
 .form-row select, .panel select { max-width: 100%; min-height: 2.75rem; padding: .55rem; border: 1px solid #738875; border-radius: .5rem; background: #fff; font: inherit; }
 .panel li { overflow-wrap: anywhere; }
+
+/* Shared account actions stay in normal flow at every viewport width. */
+.header-actions { display: flex; justify-content: flex-end; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.header-actions form { margin: 0; }
+.header-actions a, .header-actions button { font-size: .85rem; font-weight: 400; color: #315b3b; text-decoration: none; }
+.header-actions a { display: inline-flex; align-items: center; min-height: 2.75rem; }
+.header-actions button { background: transparent; margin: 0; padding: .4rem 0; }
+.brand-script { font-family: "STXingkai", "Xingkai SC", "KaiTi", "STKaiti", cursive; font-style: italic; font-weight: 500; letter-spacing: .08em; }
+.welcome-page { text-align: center; padding-top: 22vh; }
+.welcome-actions, .photo-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; }
+.photo-actions { justify-content: flex-start; }
+.photo-heading { font-size: 1rem; font-weight: 700; margin: 0 0 .5rem; }
+.photo-area input[hidden] { display: none; }
+.photo-candidates { display: flex; gap: .5rem; flex-wrap: wrap; }
+.photo-candidates button { font-size: .9rem; }

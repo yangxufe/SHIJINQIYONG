@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>编辑批次 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head><body>
 <main class="page inventory-page app-page">
+{% include 'core/header_actions.html' %}
   <p><a href="{% url 'inventory_page' %}">返回批次</a></p><h1>编辑批次信息</h1>
   <p>数量、单位和食材标识不能在此修改。数量变化请使用“用掉”“丢弃”或“校正库存”。</p>
   {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}

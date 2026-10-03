@@ -1,6 +1,8 @@
 {% load static %}
 <!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>候选菜谱 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
 <body><main class="page app-page">
+{% include 'core/header_actions.html' %}
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
   <p class="eyebrow"><a href="{% url 'workbench_page' %}">菜谱工作台</a> / 候选</p><h1>符合条件的候选</h1>
   <section class="panel"><h2>已确认的条件</h2><p>{{ conditions.people }} 人 · {% if conditions.stock_mode == 'strict' %}严格只用现有食材{% else %}允许补购{% endif %} · 最多 {{ conditions.max_minutes }} 分钟 · 辣度上限 {{ conditions.spice_max }}</p>
     <p class="small-note">营养方向：{{ conditions.goals|join:'、'|default:'未设置' }}。模型不会把“健身”改写成减脂目标。</p>

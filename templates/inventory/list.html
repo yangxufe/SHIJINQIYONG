@@ -9,6 +9,7 @@
 </head>
 <body>
 <main class="page inventory-page app-page" id="inventory-page" data-list-url="{% url 'inventory_api' %}" data-action-url="{% url 'actions_api' %}">
+{% include 'core/header_actions.html' %}
   <p class="eyebrow"><a href="{% url 'index' %}">食尽其用</a> / 冰箱</p>
   <h1>食材批次</h1>
   <p>每次实际使用或丢弃后再确认数量。储存待核对、疑似变质或包装日期已过的批次不能记为可用食材。</p>
@@ -20,9 +21,14 @@
     <form method="post" action="{% url 'inventory_page' %}" data-inventory-form data-api-url="{% url 'inventory_api' %}" data-api-method="POST" data-inventory-kind="create" data-photo-url="{% url 'inventory_recognize_api' %}">
       {% csrf_token %}<input type="hidden" name="request_id" value="{{ new_request_id }}">
       <div class="photo-area">
-        <label for="food-photo">拍照识别食材或包装</label>
-        <input id="food-photo" type="file" accept="image/*" capture="environment" aria-describedby="photo-help">
-        <p id="photo-help" class="small-note">一次拍一种食材，尽量拍清楚实物或包装文字。只在本机识别；请核对名称后保存。</p>
+        <p class="photo-heading">识别食材</p>
+        <div class="photo-actions">
+          <button type="button" class="secondary-button" data-photo-input="food-camera">拍照</button>
+          <button type="button" class="secondary-button" data-photo-input="food-album">相册</button>
+        </div>
+        <input id="food-camera" type="file" accept="image/*" capture="environment" hidden tabindex="-1" aria-label="拍照识别食材">
+        <input id="food-album" type="file" accept="image/*" hidden tabindex="-1" aria-label="从相册识别食材">
+        <p id="photo-help" class="small-note">使用本机 YOLO 检测清晰可见的食材。遮挡、包装文字或相似肉类可能无法区分；请核对名称后保存。</p>
         <span id="photo-state" class="submit-state" role="status" aria-live="polite"></span>
       </div>
       <div class="fields">

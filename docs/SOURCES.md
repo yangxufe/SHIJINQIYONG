@@ -102,3 +102,13 @@ macOS 本机运行与局域网 HTTPS 的资料（2026-09-26）：[Caddy Mac 安�
 - [Caddy Automatic HTTPS](https://caddyserver.com/docs/automatic-https)：本地 CA 颁发主机名证书，客户端必须自行信任该 CA。
 - [Caddy bind](https://caddyserver.com/docs/caddyfile/directives/bind)：监听接口配置；Windows 实际监听地址仍以本机检查为准。
 - [python-zeroconf](https://github.com/python-zeroconf/python-zeroconf)：固定名称的本机 mDNS 发布实现。
+
+第一次优化与 YOLO 资料（2026-10-03 核对）：
+
+- [YOLO-World 官方文档](https://docs.ultralytics.com/models/yolo-world/)：v2 支持固定离线词表与 ONNX 导出。本轮不是专用食材训练。
+- [官方预训练权重](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8s-worldv2.pt)：实际构建输入，原权重与导出散列记录在 model_assets/yolo-food.json。
+- [Ultralytics 导出说明](https://docs.ultralytics.com/modes/export/)：本轮固定 640、opset 17、无内置 NMS，后处理由应用服务端执行。
+- [ONNX Runtime Python API](https://onnxruntime.ai/docs/api/python/api_summary.html)、[线程管理](https://onnxruntime.ai/docs/performance/tune-performance/threading.html)：CPU 会话、两线程、关闭线程空转。
+- [Ultralytics 模型许可](https://www.ultralytics.com/license)：AGPL-3.0 或另行企业许可；附上游 AGPL 全文，不替用户决定其他自写代码的许可。
+- [公开 COCO128 样本](https://github.com/ultralytics/assets/releases/download/v0.0.0/coco128.zip)：实际 smoke 测试含成功、未检出及需核对候选，不能当作完整家庭食材验证。
+- [Django 表单认证](https://docs.djangoproject.com/en/5.2/topics/auth/default/#django.contrib.auth.forms.UserCreationForm)、[Django signing](https://docs.djangoproject.com/en/5.2/topics/signing/)：邀请注册使用现有账号与密码机制、签名和有效期，未设计新登录协议。

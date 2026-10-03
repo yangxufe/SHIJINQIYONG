@@ -23,3 +23,9 @@ __pycache__/
 /collected_static/
 /work/
 /outputs/
+*.pt
+*.onnx
+!model_assets/yolo-food.onnx
+/Ultralytics/
+/weights/
+/runs/

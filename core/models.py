@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
+from uuid import uuid4
 
 
 class MemberRole(models.Model):
@@ -27,3 +28,13 @@ class HouseholdSettings(models.Model):
 
     class Meta:
         constraints = [models.CheckConstraint(condition=Q(id=1), name="one_household_row")]
+
+
+class MemberInvitation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                   related_name="member_invitations")
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used_by = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+                                  null=True, blank=True, related_name="registration_invitation")

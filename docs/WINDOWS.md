@@ -27,6 +27,8 @@ Start-ScheduledTask -TaskName ShiJinQiYong-Waitress
 
 再次检查：Waitress 只能监听 `127.0.0.1:8000`，Caddy 应监听已确认的家庭 IPv4 的 `8443`。在浏览器打开 `https://<当前已配置的家庭IPv4>:8443/health/`，应见 `{"status": "ok"}`。地址变化时，**先确认新网络可信**，再同步 Django Host/CSRF、Caddy 监听地址及防火墙范围；不能仅把网址里的数字改掉。手机仍出现证书警告时不要输入账号密码。原主机的现行状态与证书人工步骤见 [HANDOFF.md](HANDOFF.md)。
 
+更新源码或模型后要重启 Waitress：先执行 `& scripts/stop_waitress_for_backup.ps1`，必须成功并清空 8000 监听；完成备份/更新/迁移/静态收集后，再 `Start-ScheduledTask -TaskName ShiJinQiYong-Waitress`。停止脚本会核对本项目 Python 父子进程，避免 venv 的基础解释器残留继续使用旧代码。失败时不要继续备份或并行启动。
+
 ## B. 在另一台 Windows 电脑首次安装
 
 ### 1. 准备程序和网络信息
@@ -132,7 +134,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Caddy 配置检查失败，服务未启动。'
 caddy run --config .\config\Caddyfile.windows --adapter caddyfile
 ```
 
-新 Windows 配置绑定指定 IPv4 的 HTTPS `8443`，Caddy 再按指定家庭 CIDR 拒绝其他来源；大文件上传只在菜谱附件路径放行。两个窗口关闭后服务停止。这里没有创建常驻 Windows 服务，照片识别所需的本机 Ollama 也不是基础功能的启动前提。
+新 Windows 配置绑定指定 IPv4 的 HTTPS `8443`，Caddy 再按指定家庭 CIDR 拒绝其他来源；大文件上传只在菜谱附件路径放行。两个窗口关闭后服务停止。这里没有创建常驻 Windows 服务，照片识别改为本机 YOLO；按 [YOLO.md](YOLO.md) 安装随仓库提供的模型后使用，不需启动视觉 Ollama。
 
 ### 4. 只对已确认的家庭网络放行端口
 
@@ -171,3 +173,7 @@ Get-FileHash .\data\caddy\pki\authorities\local\root.crt -Algorithm SHA256
 关掉窗口 A 停止新电脑上的 Waitress 写入，再运行 `& .\scripts\manage_prod.ps1 backup_household`；整个私有备份目录包含 SQLite 与已引用附件，必须作为一组另存到受保护的位置。更新源码前先备份，再 `git pull --ff-only`、安装锁定依赖、执行迁移与 `collectstatic`，最后重启两个窗口。不要把 `data/`、证书私钥、运行配置、密码或 Cookie 推到仓库。
 
 原 Windows 主机的日常启动与健康探测有现有运行记录；**本篇新电脑首次安装流程未在另一台 Windows 或 Android 上端到端执行**。当前原主机的 Android 证书信任仍有未完成项，不能据电脑端健康页声称手机已能安全登录。Python 虚拟环境、Caddy Windows 运行及防火墙参数分别参见 [Python 官方文档](https://docs.python.org/3.12/library/venv.html)、[Caddy 官方文档](https://caddyserver.com/docs/running)和 [Microsoft 防火墙命令文档](https://learn.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule)。
+
+## 本轮更新及注册
+
+已有用户先停止 Waitress、更新代码并安装 requirements.lock，然后执行 migrate、collectstatic、`& .\.venv\Scripts\python.exe scripts/install_yolo_food.py`，再恢复 Waitress；步骤和校验见 [YOLO.md](YOLO.md)。首次安装者也须执行此模型安装命令。普通成员由管理员在“家庭设置”生成一次性邀请码，在欢迎页“注册”建立独立账号；原 manage_member 本机命令仍可用。家庭数据不从 GitHub 自动下载。
