@@ -24,7 +24,7 @@ Start-ScheduledTask -TaskName ShiJinQiYong-Waitress
 
 ## GitHub 交付状态
 
-先前会话的 .git 只读与网络限制已由用户解除。Git CLI fetch 已成功，远端 main 与优化前基线 c524328 一致；本轮通过 CLI 按明确文件清单提交和推送，不依赖此前返回 404 的 GitHub 应用连接。最终远端核对结果记录在 PROGRESS.md。data/、.venv、work、outputs、运行密钥、照片和私有备份不进入 GitHub。
+先前会话的 .git 只读与网络限制已由用户解除。本轮 68 文件优化提交 10555bf14d275a270a279fdec1680eda64cde332 已通过 Git CLI 推送至 yangxufe/SHIJINQIYONG 的 main，ls-remote 核对通过；随后从 GitHub 独立浅克隆取得相同提交，完整 ONNX 模型及安装副本 SHA-256 一致。下载请取当前最新 main，后续交付文档另有小提交；证据见 PROGRESS.md。data/、.venv、work、outputs、运行密钥、照片和私有备份未上传。没有使用另一位协作者账号测试访问权限；协作者仍需拥有此仓库的读取权限。
 
 ---
 
