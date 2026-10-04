@@ -14,7 +14,9 @@
 
 **本机部署与数据核对：**stop_waitress_for_backup.ps1 实际停止成功、8000 清空后，生产 migrate --noinput 返回无待执行迁移；collectstatic 复制 2 文件、5 未变化、后处理 7，退出码 0。随后启动 Waitress 任务，loopback 代理头诊断 health/welcome/login/register 200、health=ok，匿名库存/菜谱 API 401。生产账号、角色、邀请、食材、批次、动作、流水、采购、家庭菜谱和营养 10 表与本轮备份逐行相同（账号 2、批次 1、流水 1、营养 14），完整性 ok、外键问题 0。check --deploy 退出码 0，仅原 IP HSTS security.W004。Caddy 仍为 Stopped，本轮没有开放新网络。
 
-GitHub 同步结果完成后另记。未执行 Android/macOS 实机、新的漏洞扫描或真实菜谱生成模型联调；手机证书信任待办继续保留。代码回退只需切换原版本并 collectstatic/重启，不回滚真实数据库；若全库恢复会丢失备份后新增数据，须按既有安全流程确认。
+**GitHub 实际同步：**提交前再次 fetch，远端仍为原 e1f1e2a，没有覆盖其他提交；40 文件明确名单、类型及私钥模式检查、cached diff --check 均通过，仅提交本轮源码/测试/文档。提交 b5deb6e0609bce0bc21f8a8635b9e57e19168d43 已 push 至 yangxufe/SHIJINQIYONG 的 main，ls-remote 核对同一 SHA；随后本记录与交接另作文档提交，下载请取最新 main。无数据库、密钥、Cookie、运行配置、照片、日志或备份进入 Git。没有使用另一协作者账号验证下载权限。
+
+未执行 Android/macOS 实机、新的漏洞扫描或真实菜谱生成模型联调；手机证书信任待办继续保留。代码回退只需切换原版本并 collectstatic/重启，不回滚真实数据库；若全库恢复会丢失备份后新增数据，须按既有安全流程确认。下一步可发送“验收第二次优化的手机界面”，或继续提供下一份明确问题清单。
 
 ## 阶段 01：环境、骨架与可信 HTTPS（2026-09-25）
 
