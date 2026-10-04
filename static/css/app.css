@@ -2,7 +2,6 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: #f5f7f2; color: #1f3326; }
 .page { width: min(100%, 38rem); min-height: 100vh; margin: 0 auto; padding: 4rem 1.5rem; }
-.eyebrow { color: #426b4d; font-weight: 700; letter-spacing: .04em; }
 h1 { font-size: clamp(2.25rem, 9vw, 3.5rem); line-height: 1.1; margin: 1rem 0; }
 p { font-size: 1.1rem; line-height: 1.7; }
 .note { margin-top: 2rem; padding: 1rem; border-radius: .75rem; background: #e8efe5; font-size: .95rem; }
@@ -23,7 +22,7 @@ h3 { margin: .2rem 0; font-size: 1.2rem; }
 .pagination { display: flex; gap: 1rem; align-items: center; }
 .submit-state { margin-left: .7rem; font-size: .9rem; }
 @media (min-width: 38rem) { .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.app-page { padding-top: 1.5rem; padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
+.app-page { padding-top: 1.5rem; padding-bottom: calc(3rem + env(safe-area-inset-bottom)); }
 .app-header { padding-bottom: .4rem; }
 .today-header-actions { display: flex; justify-content: flex-end; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .today-header-actions form { margin: 0; }
@@ -38,9 +37,6 @@ h3 { margin: .2rem 0; font-size: 1.2rem; }
 .toolbar, .account-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
 .secondary-button { background: #e4ece2; color: #1f3326; border: 1px solid #6b826e; }
 .text-button { background: transparent; color: #315b3b; text-decoration: underline; }
-.bottom-nav { position: fixed; z-index: 10; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 38rem; margin: 0 auto; padding: .25rem .4rem calc(.3rem + env(safe-area-inset-bottom)); border-top: 1px solid #bfd1be; background: #fff; box-shadow: 0 -.3rem 1rem #1f332611; }
-.bottom-nav a { display: flex; justify-content: center; align-items: center; min-height: 3rem; padding: .25rem; border-radius: .5rem; color: #315b3b; text-align: center; text-decoration: none; font-weight: 700; font-size: .9rem; }
-.bottom-nav a[aria-current="page"] { background: #dcebd8; color: #183d22; }
 .search-form { margin: .75rem 0 1rem; }
 .search-form label { display: block; margin-bottom: .35rem; }
 .search-row { display: flex; align-items: stretch; gap: .5rem; }
@@ -82,7 +78,7 @@ textarea { width: 100%; padding: .65rem .75rem; border: 1px solid #738875; borde
 .pagination { flex-wrap: wrap; }
 button:disabled { opacity: .7; cursor: progress; }
 :is(a, button, input, select, textarea):focus-visible { outline: 3px solid #c56619; outline-offset: 2px; }
-@media (max-width: 23rem) { .page { padding-left: 1rem; padding-right: 1rem; } .bottom-nav a { font-size: .82rem; } }
+@media (max-width: 23rem) { .page { padding-left: 1rem; padding-right: 1rem; } }
 .shopping-item form { margin-top: .75rem; }
 .shopping-item .fields { gap: .65rem; }
 .shopping-item .fields button { margin-top: .4rem; }
@@ -98,9 +94,11 @@ button:disabled { opacity: .7; cursor: progress; }
 .panel li { overflow-wrap: anywhere; }
 
 /* Shared account actions stay in normal flow at every viewport width. */
-.header-actions { display: flex; justify-content: flex-end; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.page-controls { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.header-actions { display: flex; justify-content: flex-end; align-items: center; gap: .8rem; flex-wrap: wrap; margin-left: auto; }
 .header-actions form { margin: 0; }
-.header-actions a, .header-actions button { font-size: .85rem; font-weight: 400; color: #315b3b; text-decoration: none; }
+.home-return, .header-actions a, .header-actions button { font-size: .85rem; font-weight: 400; color: #315b3b; text-decoration: none; }
+.home-return { display: inline-flex; align-items: center; min-height: 2.75rem; }
 .header-actions a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 .header-actions button { background: transparent; margin: 0; padding: .4rem 0; }
 .brand-script { font-family: "STXingkai", "Xingkai SC", "KaiTi", "STKaiti", cursive; font-style: italic; font-weight: 500; letter-spacing: .08em; }
@@ -111,3 +109,11 @@ button:disabled { opacity: .7; cursor: progress; }
 .photo-area input[hidden] { display: none; }
 .photo-candidates { display: flex; gap: .5rem; flex-wrap: wrap; }
 .photo-candidates button { font-size: .9rem; }
+.home-options { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.home-option { display: block; margin: 0; text-decoration: none; color: inherit; }
+.home-option:hover { border-color: #6b826e; background: #f1f7ee; }
+.home-option p { margin-bottom: .2rem; }
+.password-control { position: relative; min-width: 0; }
+.password-control input { padding-inline-end: 3.25rem; }
+.password-peek { position: absolute; inset-inline-end: .15rem; top: 50%; transform: translateY(-50%); width: 2.75rem; height: 2.75rem; margin: 0; padding: .5rem; display: grid; place-items: center; background: transparent; color: #315b3b; }
+.password-peek[hidden] { display: none; }

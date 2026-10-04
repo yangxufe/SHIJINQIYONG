@@ -10,7 +10,6 @@
 <body>
   <main class="page">
 {% include 'core/header_actions.html' %}
-    <p class="eyebrow">食尽其用</p>
     <h1>家庭设置</h1>
     {% if household %}<p>{{ household.display_name }} · {{ household.time_zone }}</p>{% endif %}
     <p><a href="{% url 'personal_taste' %}">我的口味配置</a></p>
@@ -22,7 +21,6 @@
       {% if invitation_token %}<label for="invitation-token">邀请码（24 小时内有效，用后失效）</label><textarea id="invitation-token" rows="4" readonly>{{ invitation_token }}</textarea><p class="small-note">成员在登录首页的“注册”页面填写此码。</p>{% endif %}
     </section>
     {% else %}<p class="small-note">家庭默认口味及成员邀请由管理员维护。</p>{% endif %}
-    <p><a href="{% url 'index' %}">返回首页</a></p>
   </main>
 </body>
 </html>

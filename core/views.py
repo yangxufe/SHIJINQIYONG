@@ -60,7 +60,7 @@ def register(request):
 
 @require_GET
 def index(request):
-    return render(request, "core/index.html", today_service.get_today(request.user))
+    return render(request, "core/index.html")
 
 
 @require_GET

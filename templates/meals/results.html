@@ -3,7 +3,7 @@
 <body><main class="page app-page">
 {% include 'core/header_actions.html' %}
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
-  <p class="eyebrow"><a href="{% url 'workbench_page' %}">菜谱工作台</a> / 候选</p><h1>符合条件的候选</h1>
+  <h1>符合条件的候选</h1>
   <section class="panel"><h2>已确认的条件</h2><p>{{ conditions.people }} 人 · {% if conditions.stock_mode == 'strict' %}严格只用现有食材{% else %}允许补购{% endif %} · 最多 {{ conditions.max_minutes }} 分钟 · 辣度上限 {{ conditions.spice_max }}</p>
     <p class="small-note">营养方向：{{ conditions.goals|join:'、'|default:'未设置' }}。模型不会把“健身”改写成减脂目标。</p>
     {% if inventory_changed %}<p class="notice">冰箱已变化；以下分配按当前库存重新计算，选定菜单和实际使用时还会复核。</p>{% endif %}
@@ -35,4 +35,5 @@
     {% else %}<p>模型未配置；当前显示的是本地真实库存匹配，没有冒充 AI 生成。</p>{% endif %}
   </section>
   <p><a href="{% url 'personal_taste' %}">编辑个人口味与限制</a></p>
-</main>{% include 'core/nav.html' with active_tab='recipes' %}</body></html>
+  <p><a href="{% url 'workbench_page' %}">调整本餐条件</a></p>
+</main></body></html>

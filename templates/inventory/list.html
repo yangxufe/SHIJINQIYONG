@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>冰箱与批次 · 食尽其用</title>
+  <title>添加菜品 · 食尽其用</title>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body>
 <main class="page inventory-page app-page" id="inventory-page" data-list-url="{% url 'inventory_api' %}" data-action-url="{% url 'actions_api' %}">
 {% include 'core/header_actions.html' %}
-  <p class="eyebrow"><a href="{% url 'index' %}">食尽其用</a> / 冰箱</p>
-  <h1>食材批次</h1>
+  <h1>添加菜品</h1>
+  <p class="small-note"><strong>今天先吃</strong> · 计划日期是安排提醒，不是安全期限。</p>
   <p>每次实际使用或丢弃后再确认数量。储存待核对、疑似变质或包装日期已过的批次不能记为可用食材。</p>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
   {% if error %}<p class="error" role="alert">{{ error }}。请核对输入后重试；如请求超时，请保留原编号核对结果。</p>{% endif %}
@@ -96,7 +96,6 @@
     </nav>
   </section>
 </main>
-{% include 'core/nav.html' with active_tab='inventory' %}
 <script type="module" src="{% static 'js/inventory.js' %}"></script>
 </body>
 </html>

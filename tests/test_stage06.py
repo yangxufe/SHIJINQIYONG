@@ -120,7 +120,7 @@ class ShoppingTests(TestCase):
         browser = Client(enforce_csrf_checks=True)
         browser.force_login(self.user, backend="django.contrib.auth.backends.ModelBackend")
         page = browser.get("/shopping/", secure=True)
-        self.assertContains(page, "采购清单")
+        self.assertContains(page, "采购计划")
         token = re.search(rb'name="csrfmiddlewaretoken" value="([^"]+)"', page.content).group(1).decode()
         body = {"request_id": str(uuid4()), "name": "土豆", "quantity": "2", "unit": "piece", "csrfmiddlewaretoken": token}
         self.assertEqual(browser.post("/shopping/", body, secure=True).status_code, 403)

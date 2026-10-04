@@ -9,7 +9,6 @@
 </head>
 <body>
   <main class="page">
-    <p class="brand-script">食尽其用</p>
     <h1>登录</h1>
     {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
     {% if form.errors %}<p class="error" role="alert">账号或密码错误，请重试。</p>{% endif %}
@@ -18,11 +17,15 @@
       <label for="id_username">成员账号</label>
       <input id="id_username" name="username" type="text" autocomplete="username" maxlength="150" required autofocus>
       <label for="id_password">密码</label>
-      <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+      <div class="password-control">
+        <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+        {% include 'core/password_peek.html' with input_id='id_password' %}
+      </div>
       <input type="hidden" name="next" value="{{ next }}">
       <button type="submit">登录</button>
     </form>
-    <p><a href="{% url 'register' %}">注册成员账号</a> · <a href="{% url 'welcome' %}">返回首页</a></p>
+    <p><a href="{% url 'register' %}">注册成员账号</a> · <a href="{% url 'welcome' %}">返回封面</a></p>
   </main>
+<script type="module" src="{% static 'js/password-peek.js' %}"></script>
 </body>
 </html>

@@ -4,14 +4,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>做什么 · 食尽其用</title>
+  <title>{% if library %}已保存的菜谱{% else %}查看菜谱{% endif %} · 食尽其用</title>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body>
 <main class="page app-page" id="recipes-page">
 {% include 'core/header_actions.html' %}
-  <p class="eyebrow">食尽其用 / 做什么</p>
-  <h1>{% if library %}已保存的菜谱{% else %}做什么{% endif %}</h1>
+  <h1>{% if library %}已保存的菜谱{% else %}查看菜谱{% endif %}</h1>
   <p class="small-note">{% if library %}这里可以浏览本地及家庭保存的内容；收藏不代表当前库存匹配。{% else %}菜谱按当前可用食材的匹配程度排序。疑似变质、储存待核对和包装日期已过的批次不计入；{% endif %}这里不猜用量，选择菜谱不会扣库存。</p>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
   <section class="panel"><h2>个性化菜谱</h2>
@@ -19,7 +18,7 @@
     <p class="small-note">填写人数、口味、器材与食材模式后，直接生成；生成与浏览不会扣库存。</p>
   </section>
   <p><a class="action-link" href="{% url 'recipe_new' %}">＋ 新增或收藏家庭菜谱</a></p>
-  <p>{% if library %}<a href="{% url 'recipes_page' %}">返回做什么</a>{% else %}<a href="{% url 'recipe_library' %}">浏览已保存的菜谱</a>{% endif %}</p>
+  <p>{% if library %}<a href="{% url 'recipes_page' %}">返回查看菜谱</a>{% else %}<a href="{% url 'recipe_library' %}">浏览已保存的菜谱</a>{% endif %}</p>
   <form method="get" action="{% if library %}{% url 'recipe_library' %}{% else %}{% url 'recipes_page' %}{% endif %}" class="panel recipe-filter">
     <label for="recipe-category">分类</label>
     <select id="recipe-category" name="category">
@@ -55,7 +54,6 @@
   <p class="small-note">这里的“已找到”只表示库存里有对应名称的可用批次；请自行核对真实份量和食材状况。</p>
   {% endif %}
 </main>
-{% include 'core/nav.html' with active_tab='recipes' %}
 <script type="module" src="{% static 'js/recipe-search.js' %}"></script>
 </body>
 </html>

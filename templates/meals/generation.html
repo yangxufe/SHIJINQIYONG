@@ -1,7 +1,7 @@
 {% load static %}
 <!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>生成任务 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
 <body><main class="page app-page">
-{% include 'core/header_actions.html' %}<p class="eyebrow"><a href="{% url 'workbench_results' task.recipe_request.id %}">候选菜谱</a> / 生成任务</p><h1>菜谱生成</h1>
+{% include 'core/header_actions.html' %}<h1>菜谱生成</h1>
   <section class="panel" {% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}data-generation-status="{% url 'generation_status' task.id %}"{% endif %}><p>当前状态：{{ task.get_status_display }}</p>
     {% if task.status == 'failed' or task.status == 'timed_out' %}<p class="error">未生成可用菜谱。错误代码：{{ task.error_code }}。本地菜谱和库存功能仍可正常使用。</p>{% endif %}
     {% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}
@@ -21,4 +21,5 @@
       <form method="post" action="{% url 'generation_save' task.id %}">{% csrf_token %}<input type="hidden" name="request_id" value="{{ task.request_id }}"><button type="submit">确认保存到家庭菜谱</button></form>
     {% endif %}
   </section>
-</main>{% include 'core/nav.html' with active_tab='recipes' %}{% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}<script type="module" src="{% static 'js/generation-status.js' %}"></script>{% endif %}</body></html>
+  <p><a href="{% url 'workbench_results' task.recipe_request.id %}">返回候选菜谱</a></p>
+</main>{% if task.status == 'queued' or task.status == 'running' or task.status == 'validating' %}<script type="module" src="{% static 'js/generation-status.js' %}"></script>{% endif %}</body></html>

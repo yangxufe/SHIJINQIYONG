@@ -14,18 +14,21 @@ class PageAdjustmentTests(TestCase):
         MemberRole.objects.create(user=self.user, role="member")
         self.client.force_login(self.user, backend="django.contrib.auth.backends.ModelBackend")
 
-    def test_today_keeps_only_heading_and_date_note_with_logout_at_top(self):
+    def test_home_has_new_navigation_and_date_note_moves_to_inventory(self):
         response = self.client.get("/", secure=True)
         self.assertEqual(response.status_code, 200)
         html = response.content.decode()
-        self.assertIn("今天先吃", html)
-        self.assertIn("计划日期是安排提醒，不是安全期限。", html)
-        self.assertLess(html.index("退出登录"), html.index("<h1>今天先吃</h1>"))
+        self.assertIn("首页", html)
+        inventory_html = self.client.get("/inventory/", secure=True).content.decode()
+        self.assertIn("今天先吃", inventory_html)
+        self.assertIn("计划日期是安排提醒，不是安全期限。", inventory_html)
+        self.assertLess(html.index("退出登录"), html.index("<h1>首页</h1>"))
         self.assertNotIn("显示各组前 3 批", html)
         self.assertNotIn("先安排", html)
         self.assertNotIn("需要核对", html)
         self.assertNotIn("today-refresh", html)
         self.assertIn('action="/logout/"', html)
+        self.assertNotIn('class="bottom-nav"', html)
 
     def test_inventory_hides_raw_package_date_without_erasing_old_value(self):
         created = inventory_service.create_lot(self.user, {

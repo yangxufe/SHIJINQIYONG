@@ -1,6 +1,9 @@
 {% if request.user.is_authenticated %}
+<div class="page-controls">
+  {% if not home_page %}<a class="home-return" href="{% url 'index' %}">返回首页</a>{% endif %}
 <div class="header-actions" aria-label="账号操作">
   <a href="{% url 'household_settings' %}">家庭设置</a>
   <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">退出登录</button></form>
+</div>
 </div>
 {% endif %}

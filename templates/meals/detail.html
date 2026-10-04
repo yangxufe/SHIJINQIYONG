@@ -10,7 +10,6 @@
 <body>
 <main class="page app-page recipe-detail-page">
 {% include 'core/header_actions.html' %}
-  <p class="eyebrow"><a href="{% url 'recipes_page' %}">做什么</a> / 菜谱</p>
   <h1>{{ recipe.name }}</h1>
   <p class="recipe-meta">{{ recipe.category }} · {{ recipe.source_label }}{% for tag in recipe.tags %} · #{{ tag }}{% endfor %}</p>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
@@ -79,14 +78,14 @@
       {% for ingredient in recipe.ingredients %}
       <div class="panel recipe-ingredient"><h3>{{ ingredient.name }}</h3>
         {% if ingredient.lots %}<p>已找到 {{ ingredient.lots|length }} 个可用批次。</p>
-        {% else %}<p>暂无可用批次，请到<a href="{% url 'inventory_page' %}">冰箱</a>核对或录入。</p>{% endif %}
+        {% else %}<p>暂无可用批次，请到<a href="{% url 'inventory_page' %}">添加菜品页</a>核对或录入。</p>{% endif %}
       </div>
       {% endfor %}
     {% endif %}
   </section>
   <p class="small-note">菜谱只供做饭参考，不表示食材一定安全；疑似变质、储存待核对和包装日期已过的批次不会用于匹配或扣减。</p>
+  <p><a href="{% url 'recipes_page' %}">返回查看菜谱</a></p>
 </main>
-{% include 'core/nav.html' with active_tab='recipes' %}
 {% if recipe.is_family %}<script type="module" src="{% static 'js/recipe-upload.js' %}"></script>{% endif %}
 </body>
 </html>

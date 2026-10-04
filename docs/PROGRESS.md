@@ -1,5 +1,21 @@
 # 食尽其用实施进度
 
+## 第二次优化问题清单（2026-10-04）
+
+依据用户 DOCX 中 4 项（无图片）增量修改现有程序；ECC 仍为方案目录，实际项目为既有 Codex 程序目录。开始时工作树干净，HEAD 与 origin/main 同为 e1f1e2ac0268a5b4568922f33586dbfe472f8c18。创建本机回退标记 rollback-before-second-optimization-20261004，实际停止 Waitress、备份 household-20261004-130018-a21a03b8（0 附件）并恢复任务，备份未上传。
+
+**实现：**封面 → 登录/邀请注册 → 内部首页 → 添加菜品/查看菜谱/采购计划，复用原路由及数据。所有应用页共用左上返回首页、右上家庭设置/CSRF POST 退出；首页只提供三个功能入口，旧底部导航与重复路径标题删除，详情/工作台等业务返回保留。今天先吃与计划日期说明放在添加菜品页，原今日 API 保留。新注册用户名 10 字符上限、Django 最小密码 8 字符；相似/常用/纯数字校验和邀请码权限保留，已有长用户名继续登录。登录及注册两个密码框使用本地 SVG 眼睛，显示 1 秒、失焦/隐藏/离页恢复，无 JS 时仍隐藏可提交。
+
+**文件：**core/forms.py、core/views.py、config/settings/base.py、模板公共片段和主/次级页面、static/css/app.css、static/js/password-peek.js、tests/test_second_optimization.py 及受新标题影响的旧测试；新增设计记录 docs/plans/2026-10-04-second-optimization-design.md，更新 AGENTS/ARCHITECTURE/API/SECURITY/README/ACCEPTANCE/HANDOFF。本轮不改 YOLO、库存事务、采购或菜谱服务，不新增依赖和迁移、不重置数据。
+
+**实际回归：**完整 `manage.py test tests --settings=config.settings.test --noinput` 最终 113 项、16.737 秒、退出码 0。首轮 113 项有 2 项失败：新测试误用 tomato-eggs 编号，旧阶段 04 测试仍期待旧首页说明和四标签；分别改为原稳定 tomato-egg 编号及新页面合同后复测。断言仍核对今日 API、库存、导航及数据副作用，未跳过测试或模拟掉事务。新 7 项测试覆盖四层入口、次级返回、10/11 字符和 7/8 位边界、其他密码校验、有效邀请角色、旧长账号真实 CSRF 登录/退出及浏览不改变数量/流水。makemigrations --check --dry-run 无变化，git diff --check 退出码 0。
+
+**实际浏览器：**独立 work/second-optimization-ui 数据库迁移成功，合成账号实点封面/登录/三个首页入口/各返回首页/退出/注册返回封面。320、390、1280 CSS 像素下三个功能页与注册页没有横向溢出，页头底部 68、标题顶部 84 CSS 像素；返回与右侧操作均 13.6px、无下划线。眼睛宽 44px，输入右侧预留 52px，没有遮挡文本。两个注册眼睛点击后 type=text，1100ms 复查 type=password；登录眼睛也实点恢复。控制台 error/warn 为空，实际截图 outputs/second-optimization-home.png、second-optimization-register.png 仅本地保存；不是 Android 实机。
+
+**本机部署与数据核对：**stop_waitress_for_backup.ps1 实际停止成功、8000 清空后，生产 migrate --noinput 返回无待执行迁移；collectstatic 复制 2 文件、5 未变化、后处理 7，退出码 0。随后启动 Waitress 任务，loopback 代理头诊断 health/welcome/login/register 200、health=ok，匿名库存/菜谱 API 401。生产账号、角色、邀请、食材、批次、动作、流水、采购、家庭菜谱和营养 10 表与本轮备份逐行相同（账号 2、批次 1、流水 1、营养 14），完整性 ok、外键问题 0。check --deploy 退出码 0，仅原 IP HSTS security.W004。Caddy 仍为 Stopped，本轮没有开放新网络。
+
+GitHub 同步结果完成后另记。未执行 Android/macOS 实机、新的漏洞扫描或真实菜谱生成模型联调；手机证书信任待办继续保留。代码回退只需切换原版本并 collectstatic/重启，不回滚真实数据库；若全库恢复会丢失备份后新增数据，须按既有安全流程确认。
+
 ## 阶段 01：环境、骨架与可信 HTTPS（2026-09-25）
 
 **状态：**本机骨架、迁移、Caddy HTTPS 反向代理与 loopback Waitress 已运行并通过本机检查。真实手机在新 Django 页面上的无警告访问、以及另一设备不能直连 8000，仍待现场反馈；不得据此宣称应用已上线验收。

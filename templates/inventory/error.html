@@ -6,4 +6,4 @@
 <form method="post" action="{% url 'inventory_action_form' %}" data-inventory-form data-api-url="{% url 'actions_api' %}" data-api-method="POST" data-inventory-kind="action">{% csrf_token %}
 <input type="hidden" name="request_id" value="{{ retry.request_id }}"><input type="hidden" name="kind" value="{{ retry.kind }}"><input type="hidden" name="lot_id" value="{{ retry.lot_id }}"><input type="hidden" name="version" value="{{ retry.version }}"><input type="hidden" name="unit" value="{{ retry.unit }}"><input type="hidden" name="quantity" value="{{ retry.quantity }}"><input type="hidden" name="note" value="{{ retry.note }}">
 <button type="submit">用原编号重试</button><span class="submit-state" role="status" aria-live="polite"></span></form>{% endif %}
-<p><a href="{% url 'inventory_page' %}">返回批次列表</a></p></main>{% include 'core/nav.html' with active_tab='inventory' %}<script type="module" src="{% static 'js/inventory.js' %}"></script></body></html>
+<p><a href="{% url 'inventory_page' %}">返回批次列表</a></p></main><script type="module" src="{% static 'js/inventory.js' %}"></script></body></html>

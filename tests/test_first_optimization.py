@@ -37,16 +37,16 @@ class FirstOptimizationTests(TestCase):
         invitation = MemberInvitation.objects.get()
         token = signing.dumps(str(invitation.pk), salt=INVITATION_SALT)
         self.assertContains(page, "邀请码")
-        payload = {"username": "new-family-member", "password1": "Test-only!register-7629", "password2": "Test-only!register-7629", "invitation": token}
+        payload = {"username": "newmember", "password1": "Test-only!register-7629", "password2": "Test-only!register-7629", "invitation": token}
         bad = anonymous.post("/register/", {**payload, "invitation": "bad"}, secure=True)
         self.assertEqual(bad.status_code, 422)
         result = anonymous.post("/register/", payload, secure=True)
         self.assertRedirects(result, "/login/", fetch_redirect_response=False)
-        user = get_user_model().objects.get(username="new-family-member")
+        user = get_user_model().objects.get(username="newmember")
         self.assertTrue(user.check_password(payload["password1"]))
         self.assertEqual(user.member_role.role, "member")
         self.assertFalse(user.is_staff)
-        self.assertEqual(anonymous.post("/register/", {**payload, "username": "second-member"}, secure=True).status_code, 422)
+        self.assertEqual(anonymous.post("/register/", {**payload, "username": "othermem"}, secure=True).status_code, 422)
         invitation.refresh_from_db()
         self.assertEqual(invitation.used_by_id, user.pk)
         self.assertEqual(InventoryLot.objects.count(), 0)
@@ -54,7 +54,7 @@ class FirstOptimizationTests(TestCase):
     def test_expired_invitation_and_csrf_and_member_permission(self):
         invitation = MemberInvitation.objects.create(created_by=self.admin, expires_at=timezone.now()-timedelta(seconds=1))
         token = signing.dumps(str(invitation.pk), salt=INVITATION_SALT)
-        payload = {"username": "not-created", "password1": "Test-only!register-7629", "password2": "Test-only!register-7629", "invitation": token}
+        payload = {"username": "notcreated", "password1": "Test-only!register-7629", "password2": "Test-only!register-7629", "invitation": token}
         self.assertEqual(Client().post("/register/", payload, secure=True).status_code, 422)
         self.assertEqual(Client(enforce_csrf_checks=True).post("/register/", payload, secure=True).status_code, 403)
         self.assertEqual(self.client.post("/settings/", {"create_invitation": "yes"}, secure=True).status_code, 403)

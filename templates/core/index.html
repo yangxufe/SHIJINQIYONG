@@ -4,22 +4,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>今天先吃 · 食尽其用</title>
+  <title>首页 · 食尽其用</title>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
 </head>
 <body>
-<main class="page app-page" id="today-page">
+<main class="page app-page" id="home-page">
   <header class="app-header">
-    {% include 'core/header_actions.html' %}
-    <h1>今天先吃</h1>
-    <p class="small-note">计划日期是安排提醒，不是安全期限。</p>
+    {% include 'core/header_actions.html' with home_page=True %}
+    <h1>首页</h1>
   </header>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
-  <section class="panel" aria-labelledby="today-add-heading">
-    <h2 id="today-add-heading">添加菜品</h2>
-    <a class="action-link" href="{% url 'inventory_page' %}#new-lot-heading">添加菜品或食材</a>
-  </section>
+  <nav class="home-options" aria-label="功能入口">
+    <a class="panel home-option" href="{% url 'inventory_page' %}"><h2>添加菜品</h2><p class="small-note">拍照或手动录入，查看与管理冰箱食材。</p></a>
+    <a class="panel home-option" href="{% url 'recipes_page' %}"><h2>查看菜谱</h2><p class="small-note">按库存找做法，生成或收藏家庭菜谱。</p></a>
+    <a class="panel home-option" href="{% url 'shopping_page' %}"><h2>采购计划</h2><p class="small-note">核对现有食材，安排采购与确认入库。</p></a>
+  </nav>
 </main>
-{% include 'core/nav.html' with active_tab='today' %}
 </body>
 </html>

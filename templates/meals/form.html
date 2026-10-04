@@ -10,7 +10,6 @@
 <body>
 <main class="page app-page recipe-form-page">
 {% include 'core/header_actions.html' %}
-  <p class="eyebrow"><a href="{% url 'recipes_page' %}">做什么</a> / 家庭菜谱</p>
   <h1>{{ page_title }}</h1>
   <p class="small-note">填写主要食材便于按冰箱现有批次匹配。保存的菜谱、笔记和上传文件仅供本家庭登录成员查看；外部教程链接仍指向原网站。</p>
   {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
@@ -32,6 +31,5 @@
   </form>
   {% if recipe %}<p><a href="{% url 'recipe_detail' recipe_id %}">返回菜谱</a></p>{% endif %}
 </main>
-{% include 'core/nav.html' with active_tab='recipes' %}
 </body>
 </html>
