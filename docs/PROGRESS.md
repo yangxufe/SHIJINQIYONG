@@ -1,6 +1,18 @@
 # 食尽其用实施进度
 
-## 当前版本 BVT（2026-10-04）
+## Caddy 恢复与局域网 HTTPS BVT（2026-10-04）
+
+用户要求启动 Caddy、恢复局域网 HTTPS。开始时 HEAD/origin/main 同为 7f41d09、工作树干净；当前 WLAN 为此前明确获准的 192.168.110.146/24。通过 Windows UAC 的管理员辅助进程核对受保护部署配置与仓库 config/Caddyfile 的 SHA-256 一致、服务仍用 LocalService、现有防火墙限定 Caddy/WLAN/本机 IPv4/TCP 8443/同子网，Public 防火墙保持启用。现存 CA 公共根与 outputs 导出一致，未改 CA、配置、ACL、防火墙或网络。随后 Start-Service 成功，状态 Running/Automatic，仅监听 192.168.110.146:8443；Waitress 仅 127.0.0.1:8000，2019 无监听。
+
+**实际 HTTPS 补测：**本机 work/https_bvt_20261004.py 经生产设置运行，最终退出码 0，30 项检查通过、27 次真实 LAN IP HTTPS 连接均用现有公开 CA、CERT_REQUIRED 和主机名校验，并核对 IP SAN 与 TLS 1.2/1.3。health/welcome/login/register 200，健康内容仅 status=ok；匿名根跳封面、业务页跳登录，五个读 API 和匿名写 API 401；缺 CSRF 的登录/注册 POST 403；四个指纹资源 200、与源码字节一致且 immutable 一年缓存，非指纹 no-store、缺文件 404；动态 no-store/CSP/框架头与 Secure/SameSite CSRF Cookie 正确；70 KB 普通 POST 413，伪造代理协议头不能触发 HTTP 跳转。没有输入真实账号密码、没有成功的业务写入。补测后 10 张生产账号/业务表仍与优化前私有备份逐行一致，integrity_check=ok、外键问题 0。
+
+**失败与校正：**首次管理员包装脚本在 Windows PowerShell 5.1 中将 Caddy 正常 stderr 信息误当异常，启动前即停止；调整原生命令的错误捕获并检查实际退出码后验证/启动成功，未跳过配置验证。HTTPS 探测首轮退出码 1，因为探测脚本假设未配置 Host 必返 400/404；实测本 Caddy 精确站点未命中时返回空 200、无应用 CSP/健康内容，没有进入 Django。改为核对实际站点隔离行为后 30 项补测通过；此项不能写成“Host 返回 400”。上述临时脚本与仅含操作状态的结果留在被忽略的 work/，不上传运行日志。
+
+**手机现场仍阻塞：**用户在当前 Wi-Fi 上报告仍有警告，截图明确为 Chrome 的 NET::ERR_CERT_AUTHORITY_INVALID、地址 192.168.110.146:8443。说明 TLS 服务可达，但手机尚未通过当前 CA 信任，不能算安全登录。公开根证书 outputs/shijinqiyong-root.cer 的 DER SHA-256 与原记录一致：5A:49:BD:03:CC:C8:2B:8F:C3:55:77:23:3A:F2:FA:27:1B:FE:F6:D9:2A:C7:6F:04:12:71:09:75:74:D6:EE:FF；PEM/DER 为同一证书，主体 Caddy Local Authority - 2026 ECC Root。安装设备根证书须使用者按 AGENTS.md 许可自行决定并在 Android 系统完成；安装及无警告重测未执行，不越过浏览器警告输入密码。具体传递、安装、撤销和复测步骤已补 HANDOFF.md。
+
+**变更与边界：**仅更新 README、BVT、HANDOFF、SECURITY、PROGRESS 的实测状态与人工步骤；无应用代码、接口、迁移、新依赖或数据恢复。此前同日 113 项完整回归及修复后 10 项针对性回归沿用原记录，本次没有冒充重新全量执行。未做新性能压测、漏洞扫描、主机重启、真实账号手机采购或真实菜谱模型联调；整体发布门禁继续因 Android 信任阻塞。下一步：在手机系统信任已核对的公开 CA 后，发送“健康页无证书警告并显示 ok”，再验收登录及采购闭环。
+
+## 核心构建 BVT：HTTPS 恢复前记录（2026-10-04）
 
 用户要求对现有版本做一轮 BVT。起点 52fcd2c、工作树干净；本轮完整 113 项实际通过（17.231 秒、退出码 0），包括原 SQLite 真实文件并发、数量/流水/幂等、权限/CSRF、邀请、采购、菜谱菜单、YOLO 输入与安装检查。pip check 无冲突、migrate --check 无待应用迁移、makemigrations --check --dry-run 无差异；check --deploy 只有既有 security.W004。
 
