@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="zh-Hans">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>采购计划 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
-<body><main class="page app-page inventory-page">
+<body><main class="page app-page inventory-page shopping-page">
 {% include 'core/header_actions.html' %}
   <h1>采购计划</h1>
   <p>先核对冰箱和清单，避免买重。买到后先标记，放入冰箱时再按实际数量入库。</p>
@@ -17,7 +17,7 @@
       <label>计划数量 <input name="quantity" inputmode="decimal" maxlength="16" required value="{{ draft.quantity|default:'' }}"></label>
       <label>单位 <select name="unit"><option value="piece" {% if draft.unit == 'piece' %}selected{% endif %}>个</option><option value="g" {% if draft.unit == 'g' %}selected{% endif %}>克</option><option value="kg" {% if draft.unit == 'kg' %}selected{% endif %}>千克</option><option value="ml" {% if draft.unit == 'ml' %}selected{% endif %}>毫升</option><option value="l" {% if draft.unit == 'l' %}selected{% endif %}>升</option><option value="pack" {% if draft.unit == 'pack' %}selected{% endif %}>包</option></select></label>
       <label class="shopping-check"><input type="checkbox" name="confirm_duplicate" value="true" {% if draft.confirm_duplicate %}checked{% endif %}> 我已核对冰箱和清单，即使已有同名食材仍需购买</label>
-      <button type="submit">加入清单</button>
+      <button type="submit" class="shopping-add-submit">加入清单</button>
     </form>
     <p class="small-note">名称按已知别名或精确文字比较；不同单位不会自动换算。实际买到的数量可在入库时填写。</p>
   </section>
@@ -50,8 +50,8 @@
   </section>
 
   <section class="panel" aria-labelledby="stock-heading"><h2 id="stock-heading">冰箱中可用的食材</h2>
-    <p class="small-note">仅统计在库、储存已核对且包装日期未过的批次；同名不同单位分开显示。其他已记录批次请到<a href="{% url 'inventory_page' %}">添加菜品页</a>核对，不能算作可用。数量不等于足够做某道菜。</p>
-    {% for row in available %}<p class="shopping-stock-row">{{ row.name }} · {{ row.quantity }} {{ row.unit_label }}</p>{% empty %}<p class="empty-state">当前没有已核对的可用批次；疑似变质或待核对的批次请到冰箱查看。</p>{% endfor %}
+    <p class="small-note">仅统计未过期的食材；已过期的食材请到“<a href="{% url 'inventory_list' %}">已添加食材</a>”查看</p>
+    {% for row in available %}<p class="shopping-stock-row">{{ row.name }} · {{ row.quantity }} {{ row.unit_label }}</p>{% endfor %}
   </section>
   <section aria-labelledby="history-heading"><h2 id="history-heading">最近记录</h2>
     {% for item in history %}<p class="panel">{{ item.name }} · {{ item.quantity }} {{ item.unit_label }} · {{ item.status_label }}{% if item.received_lot_id %} · 批次 {{ item.received_lot_id }}{% endif %}</p>{% empty %}<p class="empty-state">还没有已入库或取消的采购项。</p>{% endfor %}

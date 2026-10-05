@@ -35,7 +35,8 @@ class PhotoEntryTests(TestCase):
         page = client.get("/inventory/", secure=True)
         token = re.search(rb'name="csrfmiddlewaretoken" value="([^"]+)"', page.content).group(1).decode()
         self.assertContains(page, 'capture="environment"')
-        self.assertContains(page, "更多信息（日期、批次名、优先顺序）")
+        self.assertNotContains(page, "更多信息")
+        self.assertContains(page, "保证食材清晰可见，尽量不要遮挡")
         expected = {"ingredient_name": "番茄", "uncertain": True, "engine": "yolo",
                     "candidates": [{"ingredient_name": "番茄", "confidence": .85}]}
         with patch("inventory.recognition._detect", return_value=expected) as model:

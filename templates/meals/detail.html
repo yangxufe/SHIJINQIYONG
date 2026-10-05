@@ -78,7 +78,7 @@
       {% for ingredient in recipe.ingredients %}
       <div class="panel recipe-ingredient"><h3>{{ ingredient.name }}</h3>
         {% if ingredient.lots %}<p>已找到 {{ ingredient.lots|length }} 个可用批次。</p>
-        {% else %}<p>暂无可用批次，请到<a href="{% url 'inventory_page' %}">添加菜品页</a>核对或录入。</p>{% endif %}
+        {% else %}<p>暂无可用批次，请到<a href="{% url 'inventory_list' %}">食材列表</a>核对，或<a href="{% url 'inventory_page' %}">添加菜品</a>。</p>{% endif %}
       </div>
       {% endfor %}
     {% endif %}

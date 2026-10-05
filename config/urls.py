@@ -44,6 +44,7 @@ urlpatterns = [
     path("shopping/<int:item_id>/receive/", shopping_views.shopping_receive, name="shopping_receive"),
     path("api/settings/", views.household_settings_api, name="household_settings_api"),
     path("inventory/", inventory_views.inventory_page, name="inventory_page"),
+    path("inventory/list/", inventory_views.inventory_list, name="inventory_list"),
     path("inventory/action/", inventory_views.action_form, name="inventory_action_form"),
     path("inventory/<int:lot_id>/edit/", inventory_views.edit_page, name="inventory_edit_page"),
     path("api/inventory/", inventory_api.inventory_collection, name="inventory_api"),

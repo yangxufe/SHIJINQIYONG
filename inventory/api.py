@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_http_methods
 
 from inventory import recognition, services
+from inventory.entry import normalize_entry
 
 
 class BadJson(Exception):
@@ -57,7 +58,7 @@ def _run(fn):
 @require_http_methods(["GET", "POST"])
 def inventory_collection(request):
     if request.method == "POST":
-        return _run(lambda: services.create_lot(request.user, _body(request)))
+        return _run(lambda: services.create_lot(request.user, normalize_entry(_body(request))))
     try:
         data = services.list_lots(request.user, request.GET.get("page", "1"), request.GET.get("per_page", "50"), request.GET.get("q", ""))
     except services.InventoryError as exc:

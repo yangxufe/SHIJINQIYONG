@@ -16,6 +16,20 @@ from meals.structured import load_structured_catalog, validate_spec
 
 
 SOURCE_LABELS = {"own": "家庭自写", "video": "视频教程", "article": "文字教程", "images": "图片教程"}
+BROWSE_CATEGORIES = ("荤菜", "素菜", "汤羹", "其他")
+BUILT_IN_CATEGORIES = {
+    "tomato-egg": "素菜", "pepper-potato": "素菜", "cucumber-egg": "素菜",
+    "broccoli": "素菜", "lettuce": "素菜", "seaweed-egg-soup": "汤羹",
+    "tofu-potato-mild": "素菜", "cantonese-steamed-tofu": "素菜",
+}
+
+
+def _browse_category(recipe):
+    if recipe["category"] in BROWSE_CATEGORIES:
+        return recipe["category"]
+    if not recipe["is_family"] and recipe["id"] in BUILT_IN_CATEGORIES:
+        return BUILT_IN_CATEGORIES[recipe["id"]]
+    return {"清淡素菜": "素菜"}.get(recipe["category"], "其他")
 
 
 def _recipe_specs():
@@ -57,10 +71,13 @@ def list_recipes(actor, *, category="", query="", matched_only=False):
     if len(category) > 20 or len(query) > 80:
         raise inventory_service.InventoryError(422, "invalid_input", "筛选条件过长。")
     recipes, by_canonical, _ = _catalog_matches(actor)
-    categories = sorted({recipe["category"] for recipe in recipes})
+    categories = list(BROWSE_CATEGORIES)
     output = []
     for position, recipe in enumerate(recipes):
-        if category and recipe["category"] != category:
+        browse_category = _browse_category(recipe)
+        # Preserve old custom-category URLs while showing the four new groups.
+        filter_category = browse_category if category in BROWSE_CATEGORIES else recipe["category"]
+        if category and filter_category != category:
             continue
         if query and not any(query.casefold() in value.casefold() for value in [recipe["name"], *recipe["tags"], *recipe["ingredients"]]):
             continue
@@ -72,7 +89,7 @@ def list_recipes(actor, *, category="", query="", matched_only=False):
             "ingredients": recipe["ingredients"], "missing": missing,
             "matched_count": len(recipe["ingredients"]) - len(missing),
             "ingredient_count": len(recipe["ingredients"]),
-            "has_all": not missing, "category": recipe["category"],
+            "has_all": not missing, "category": recipe["category"], "category_group": browse_category,
             "tags": recipe["tags"], "source_label": recipe["source_label"], "_position": position,
         })
     output.sort(key=lambda item: (-item["matched_count"] / item["ingredient_count"], -item["matched_count"], item["_position"]))

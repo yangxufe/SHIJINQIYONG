@@ -1,5 +1,21 @@
 # 食尽其用实施进度
 
+## 第三次优化问题清单（2026-10-05）
+
+依据用户 DOCX 的添加菜品、查看菜谱、采购计划、独立食材列表四组要求增量实施；用户补充保质期由按钮切换填写方式。开始时工作树干净，HEAD/origin/main 为 516f80a；先创建本地回退标记 rollback-before-third-optimization-20261005，实际停止 Waitress 并完成私有备份 household-20261005-195704-1f92a1b9（0 附件），再恢复任务。设计记录见 plans/2026-10-05-third-optimization-design.md。手机证书排查按用户“先不管了”暂停。
+
+**实现与接口：**首页依次为添加菜品、食材列表、查看菜谱、采购计划。/inventory/ 仅添加，/inventory/list/ 保留原搜索、分页、编辑、用量、丢弃和校正；保存/编辑/动作后返回列表，旧带 q/page 的添加页地址兼容跳转。添加页四项必填星号、七组输入与指定拍照提示，删除更多信息折叠。保质期提供截止日期/天数切换，天数必须有显式起算日期；服务端统一转换成原 package_date 后调用原库存服务，保存最终截止日期，不持久保存本次输入模式或天数。未填保质期为未知，新录入仍储存待核对。菜谱四类按独立 category_group 浏览，原分类、标签、ID 与家庭菜谱保留；原匹配和库存筛选不变。采购勾选行独占按钮上方整行，下拉箭头统一内移，库存文案链接新列表。
+
+**变更文件：**inventory/entry.py、inventory/api.py、inventory/views.py、config/urls.py、meals/services.py、相关模板、static/css/app.css、inventory.js、新 shelf-life.js 与本地 select-chevron.svg；新增 tests/test_third_optimization.py，四份既有测试更新新页面路由/文案/入口预期。更新 AGENTS、ARCHITECTURE、API、SECURITY、README、HANDOFF、ACCEPTANCE、BVT 与本记录。无新依赖或数据库迁移，未改库存事务与采购入库服务、YOLO 模型、账号或生成模型。
+
+**实际自动化：**针对性 27 项通过（3.156 秒、退出码 0）；随后 `python manage.py test tests --settings=config.settings.test --noinput` 完整 121 项通过（20.145 秒、退出码 0），包含原真实文件 SQLite 并发和幂等回归。新增 8 项覆盖四入口/列表搜索和权限、HTML/JSON 保质期一致、闰日与起算日期边界、非法天数不写数据、未知及过期排除、CSRF/XSS、编辑/动作返回与旧版本拒绝、四类和自定义分类保留、采购确认防重复。未删断言或跳过业务测试。`makemigrations --check --dry-run --settings=config.settings.test` 无差异，`git diff --check` 退出码 0。
+
+**本机部署与数据：**按 stop_waitress_for_backup.ps1 安全停止并确认 8000 清空，生产 migrate --noinput 无待应用迁移；collectstatic 复制 4 个、5 个未变化、后处理 9 个文件，退出码 0。Waitress 任务重启后 Running，仅监听 127.0.0.1:8000。只读 work/third_optimization_deploy_check.py 检查 20 张账号及业务表与本轮备份逐行相同、integrity_check=ok、外键问题 0。11 项 loopback 代理头请求通过：公开页 200，新列表等业务页匿名跳登录，库存/菜谱/采购 API 401，动态 no-store/CSP 保留；新/改三项指纹 JS/SVG 与源码相同，收集后的 CSS 正确引用指纹 SVG。此为本机诊断，不是手机 HTTPS 验收。生产 check --deploy 只有原 security.W004，未屏蔽。
+
+**浏览器未完成：**已迁移独立 work/third-optimization-ui 合成库并创建测试账号，127.0.0.1:8766 登录服务可用。应用内浏览器既有标签停留在 data: 内置错误页，浏览器工具安全策略拒绝 reload/goto；未改用其他控制通道绕过。已请用户手动打开正常 /login/ 页后再继续。当前按钮实点、320/390/1280 布局、横向溢出与截图均未执行；自动化 HTML/接口测试不能替代这些项目。本轮未执行 Android/Mac、CA 信任修复、新性能压测、漏洞扫描或真实菜谱生成联调；阶段 08 完整发布验收仍未通过。
+
+**后续：**完成安全文件检查后同步 GitHub main，提交/远端核对结果续记于此。代码回退到 516f80a 后重新 collectstatic/重启即可，无需恢复真实数据库；备份恢复仍须遵循 HANDOFF 的停机与新数据保护步骤。人工下一步：打开独立测试登录页后继续第三次优化的浏览器验收，证书事项保持暂缓。
+
 ## Caddy 恢复与局域网 HTTPS BVT（2026-10-04）
 
 用户要求启动 Caddy、恢复局域网 HTTPS。开始时 HEAD/origin/main 同为 7f41d09、工作树干净；当前 WLAN 为此前明确获准的 192.168.110.146/24。通过 Windows UAC 的管理员辅助进程核对受保护部署配置与仓库 config/Caddyfile 的 SHA-256 一致、服务仍用 LocalService、现有防火墙限定 Caddy/WLAN/本机 IPv4/TCP 8443/同子网，Public 防火墙保持启用。现存 CA 公共根与 outputs 导出一致，未改 CA、配置、ACL、防火墙或网络。随后 Start-Service 成功，状态 Running/Automatic，仅监听 192.168.110.146:8443；Waitress 仅 127.0.0.1:8000，2019 无监听。

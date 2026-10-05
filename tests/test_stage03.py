@@ -201,7 +201,7 @@ class InventoryServiceTests(TestCase):
         new_lot(self.user, "1", ingredient_name="<img src=x onerror=alert(1)>", name="<img src=x onerror=alert(1)>")
         client = Client(enforce_csrf_checks=True)
         client.force_login(self.user, backend="django.contrib.auth.backends.ModelBackend")
-        page = client.get("/inventory/", secure=True)
+        page = client.get("/inventory/list/", secure=True)
         self.assertEqual(page.status_code, 200)
         self.assertIn(b"&lt;img", page.content)
         self.assertNotIn(b"<img src=x onerror", page.content)

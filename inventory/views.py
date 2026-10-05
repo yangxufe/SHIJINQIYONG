@@ -2,16 +2,22 @@ from uuid import uuid4
 
 from django.contrib import messages
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from inventory import services
+from inventory.entry import normalize_entry
 
 
-def _inventory_context(request, draft=None, error=None):
+def _list_context(request):
     page = services.list_lots(request.user, request.GET.get("page", "1"), query=request.GET.get("q", ""))
     for item in page["items"]:
         item["form_request_id"] = str(uuid4())
-    return {"page": page, "search_query": page["query"], "draft": draft or {}, "error": error, "new_request_id": (draft or {}).get("request_id") or str(uuid4())}
+    return {"page": page, "search_query": page["query"]}
+
+
+def _entry_context(draft=None, error=None):
+    return {"draft": draft or {}, "error": error, "new_request_id": (draft or {}).get("request_id") or str(uuid4())}
 
 
 @require_http_methods(["GET", "POST"])
@@ -20,16 +26,23 @@ def inventory_page(request):
         payload = request.POST.dict()
         payload.pop("csrfmiddlewaretoken", None)
         try:
-            services.create_lot(request.user, payload)
+            services.create_lot(request.user, normalize_entry(payload))
         except services.InventoryError as exc:
-            response = render(request, "inventory/list.html", _inventory_context(request, payload, exc.message), status=exc.status)
+            response = render(request, "inventory/add.html", _entry_context(payload, exc.message), status=exc.status)
             if exc.status == 503:
                 response["Retry-After"] = "2"
             return response
         messages.success(request, "批次已保存，入库流水已记录。")
-        return redirect("inventory_page")
+        return redirect("inventory_list")
+    if "q" in request.GET or "page" in request.GET:
+        return redirect(f"{reverse('inventory_list')}?{request.GET.urlencode()}")
+    return render(request, "inventory/add.html", _entry_context())
+
+
+@require_http_methods(["GET"])
+def inventory_list(request):
     try:
-        context = _inventory_context(request)
+        context = _list_context(request)
     except services.InventoryError as exc:
         return render(request, "inventory/error.html", {"error": exc.message}, status=exc.status)
     return render(request, "inventory/list.html", context)
@@ -52,7 +65,7 @@ def action_form(request):
             response["Retry-After"] = "2"
         return response
     messages.success(request, f"记录已保存，动作编号 {outcome['body']['action_id']}。")
-    return redirect("inventory_page")
+    return redirect("inventory_list")
 
 
 @require_http_methods(["GET", "POST"])
@@ -63,7 +76,7 @@ def edit_page(request, lot_id):
             payload.pop("csrfmiddlewaretoken", None)
             services.edit_lot(request.user, lot_id, payload)
             messages.success(request, "批次信息已更新。")
-            return redirect("inventory_page")
+            return redirect("inventory_list")
         payload = services.get_lot(request.user, lot_id)
         payload["request_id"] = str(uuid4())
     except services.InventoryError as exc:

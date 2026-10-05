@@ -117,3 +117,22 @@ button:disabled { opacity: .7; cursor: progress; }
 .password-control input { padding-inline-end: 3.25rem; }
 .password-peek { position: absolute; inset-inline-end: .15rem; top: 50%; transform: translateY(-50%); width: 2.75rem; height: 2.75rem; margin: 0; padding: .5rem; display: grid; place-items: center; background: transparent; color: #315b3b; }
 .password-peek[hidden] { display: none; }
+
+/* Third issue list: keep controls and links within their existing page style. */
+.required-mark { color: #7b241c; }
+.inventory-page .fields label { min-width: 0; }
+.shelf-life-field { grid-column: 1 / -1; min-width: 0; margin: 0; padding: .65rem .75rem; border: 1px solid #d4e0d2; border-radius: .6rem; }
+.shelf-life-field legend { padding: 0 .25rem; font-weight: 700; }
+.fields .shelf-life-toggle { display: inline-flex; align-items: center; min-height: 2.75rem; margin: 0 .35rem .75rem 0; padding: .5rem .8rem; border: 1px solid #6b826e; border-radius: .5rem; font-weight: 500; cursor: pointer; }
+.shelf-life-field input[type="radio"]:checked + label { background: #315b3b; color: #fff; }
+.shelf-life-field input[type="radio"]:focus-visible + label { outline: 3px solid #c56619; outline-offset: 2px; }
+#shelf-life-date:checked ~ .shelf-life-duration-fields, #shelf-life-days:checked ~ .shelf-life-date-fields { display: none; }
+.shelf-life-field input[type="date"], .shelf-life-field input[type="number"] { min-width: 0; }
+.save-lot-row { display: flex; align-items: center; flex-wrap: wrap; gap: .65rem; }
+.save-lot-row button { margin: 0; flex: 0 0 auto; }
+.save-lot-row .small-note { flex: 1 1 12rem; line-height: 1.5; }
+#recipes-page a { color: inherit; text-decoration: none; }
+.shopping-page select { appearance: none; -webkit-appearance: none; height: 2.75rem; padding: .55rem 2.75rem .55rem .65rem; background-color: #fff; background-image: url("../img/select-chevron.svg"); background-repeat: no-repeat; background-origin: border-box; background-position: right 1rem center; background-size: .75rem .75rem; }
+.fields .shopping-check { display: flex; grid-column: 1 / -1; align-items: flex-start; gap: .55rem; }
+.shopping-add-submit { grid-column: 1 / -1; justify-self: start; }
+@media (forced-colors: active) { .shopping-page select { appearance: auto; background-image: none; } }

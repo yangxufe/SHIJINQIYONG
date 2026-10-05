@@ -1,0 +1,56 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>添加菜品 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page inventory-page app-page" id="inventory-add-page">
+{% include 'core/header_actions.html' %}
+  <h1>添加菜品</h1>
+  <p class="small-note"><strong>今天先吃</strong> · 计划日期是安排提醒，不是安全期限。</p>
+  {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% if error %}<p class="error" role="alert">{{ error }} 请核对输入后重试；如请求超时，请保留原编号核对结果。</p>{% endif %}
+  <section aria-labelledby="new-lot-heading" class="panel">
+    <h2 id="new-lot-heading">放进冰箱</h2>
+    <form method="post" action="{% url 'inventory_page' %}" data-inventory-form data-api-url="{% url 'inventory_api' %}" data-api-method="POST" data-inventory-kind="create" data-photo-url="{% url 'inventory_recognize_api' %}">
+      {% csrf_token %}<input type="hidden" name="request_id" value="{{ new_request_id }}">
+      <div class="photo-area">
+        <p class="photo-heading">识别食材</p>
+        <div class="photo-actions">
+          <button type="button" class="secondary-button" data-photo-input="food-camera">拍照</button>
+          <button type="button" class="secondary-button" data-photo-input="food-album">相册</button>
+        </div>
+        <input id="food-camera" type="file" accept="image/*" capture="environment" hidden tabindex="-1" aria-label="拍照识别食材">
+        <input id="food-album" type="file" accept="image/*" hidden tabindex="-1" aria-label="从相册识别食材">
+        <p id="photo-help" class="small-note">保证食材清晰可见，尽量不要遮挡</p>
+        <span id="photo-state" class="submit-state" role="status" aria-live="polite"></span>
+      </div>
+      <div class="fields">
+        <label><span>食材名称 <span class="required-mark" aria-hidden="true">*</span></span><input name="ingredient_name" value="{{ draft.ingredient_name|default:'' }}" maxlength="80" required autocomplete="off"></label>
+        <label><span>数量 <span class="required-mark" aria-hidden="true">*</span></span><input name="quantity" inputmode="decimal" value="{{ draft.quantity|default:'' }}" maxlength="16" required></label>
+        <label><span>单位 <span class="required-mark" aria-hidden="true">*</span></span><select name="unit" required><option value="piece" {% if draft.unit == 'piece' %}selected{% endif %}>个</option><option value="g" {% if draft.unit == 'g' %}selected{% endif %}>克</option><option value="kg" {% if draft.unit == 'kg' %}selected{% endif %}>千克</option><option value="ml" {% if draft.unit == 'ml' %}selected{% endif %}>毫升</option><option value="l" {% if draft.unit == 'l' %}selected{% endif %}>升</option><option value="pack" {% if draft.unit == 'pack' %}selected{% endif %}>包</option></select></label>
+        <label><span>储存位置 <span class="required-mark" aria-hidden="true">*</span></span><select name="location" required><option value="fridge" {% if draft.location == 'fridge' %}selected{% endif %}>冷藏</option><option value="freezer" {% if draft.location == 'freezer' %}selected{% endif %}>冷冻</option><option value="pantry" {% if draft.location == 'pantry' %}selected{% endif %}>常温</option><option value="other" {% if draft.location == 'other' %}selected{% endif %}>其他</option></select></label>
+        <label>计划食用日期 <input type="date" name="planned_use_date" value="{{ draft.planned_use_date|default:'' }}"></label>
+        <label>采购日期 <input type="date" name="purchase_date" value="{{ draft.purchase_date|default:'' }}"></label>
+        <fieldset class="shelf-life-field">
+          <legend>保质期</legend>
+          <input class="visually-hidden" type="radio" id="shelf-life-date" name="shelf_life_mode" value="date" {% if draft.shelf_life_mode != 'days' %}checked{% endif %}>
+          <label class="shelf-life-toggle" for="shelf-life-date">截止日期</label>
+          <input class="visually-hidden" type="radio" id="shelf-life-days" name="shelf_life_mode" value="days" {% if draft.shelf_life_mode == 'days' %}checked{% endif %}>
+          <label class="shelf-life-toggle" for="shelf-life-days">天数</label>
+          <div class="shelf-life-date-fields">
+            <label>保质期截止日期 <input type="date" name="package_date" value="{{ draft.package_date|default:'' }}"></label>
+          </div>
+          <div class="shelf-life-duration-fields">
+            <div class="fields">
+              <label>保质期天数 <input type="number" name="shelf_life_days" inputmode="numeric" min="1" max="36500" step="1" value="{{ draft.shelf_life_days|default:'' }}"></label>
+              <label>起算日期 <input type="date" name="shelf_life_start" value="{{ draft.shelf_life_start|default:'' }}"></label>
+            </div>
+            <p class="small-note" id="shelf-life-preview" role="status" aria-live="polite">截止日期 = 起算日期 + 天数</p>
+          </div>
+        </fieldset>
+      </div>
+      <p class="small-note">上传图片无法判断食材的日期和安全性</p>
+      <div class="save-lot-row"><button type="submit">保存批次</button><span class="small-note">请核对图片中的食材与手动输入的食材一致</span></div>
+      <span class="submit-state" role="status" aria-live="polite"></span>
+    </form>
+  </section>
+</main><script type="module" src="{% static 'js/inventory.js' %}"></script><script type="module" src="{% static 'js/shelf-life.js' %}"></script></body></html>

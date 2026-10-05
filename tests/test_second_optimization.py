@@ -27,7 +27,7 @@ class SecondOptimizationTests(TestCase):
     def register_payload(self, username="family1234", password="N7!vQ2$x"):
         return {"username": username, "password1": password, "password2": password, "invitation": self.token}
 
-    def test_cover_to_auth_to_home_and_three_feature_pages(self):
+    def test_cover_to_auth_to_home_and_feature_pages(self):
         anonymous = Client()
         self.assertRedirects(anonymous.get("/", secure=True), "/welcome/", fetch_redirect_response=False)
         cover = anonymous.get("/welcome/", secure=True)
@@ -38,7 +38,7 @@ class SecondOptimizationTests(TestCase):
         self.assertContains(home, '<h1>首页</h1>')
         self.assertContains(home, 'aria-label="功能入口"')
         self.assertNotContains(home, 'class="home-return"')
-        for path, title in (("/inventory/", "添加菜品"), ("/recipes/", "查看菜谱"), ("/shopping/", "采购计划")):
+        for path, title in (("/inventory/", "添加菜品"), ("/inventory/list/", "食材列表"), ("/recipes/", "查看菜谱"), ("/shopping/", "采购计划")):
             self.assertContains(home, f'<h2>{title}</h2>')
             page = self.client.get(path, secure=True)
             self.assertContains(page, f'<h1>{title}</h1>')

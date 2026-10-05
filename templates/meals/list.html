@@ -11,7 +11,7 @@
 <main class="page app-page" id="recipes-page">
 {% include 'core/header_actions.html' %}
   <h1>{% if library %}已保存的菜谱{% else %}查看菜谱{% endif %}</h1>
-  <p class="small-note">{% if library %}这里可以浏览本地及家庭保存的内容；收藏不代表当前库存匹配。{% else %}菜谱按当前可用食材的匹配程度排序。疑似变质、储存待核对和包装日期已过的批次不计入；{% endif %}这里不猜用量，选择菜谱不会扣库存。</p>
+  <p class="small-note">{% if library %}这里可以浏览本地及家庭保存的内容；收藏不代表当前库存匹配。选择菜谱不会扣库存。{% else %}菜谱按当前可用食材的匹配程度排序，包装日期已过的批次不计入，选择菜谱不会扣库存{% endif %}</p>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
   <section class="panel"><h2>个性化菜谱</h2>
     <a class="action-link" href="{% url 'workbench_page' %}?direct=1">填写菜谱要求</a>
@@ -44,7 +44,7 @@
   {% for recipe in recipes %}
   <article class="panel recipe-card">
     <h2>{{ recipe.name }}</h2>
-    <p class="recipe-meta">{{ recipe.category }} · {{ recipe.source_label }}{% for tag in recipe.tags %} · #{{ tag }}{% endfor %}</p>
+    <p class="recipe-meta">{{ recipe.category_group }} · {{ recipe.source_label }}{% for tag in recipe.tags %} · #{{ tag }}{% endfor %}</p>
     <p>{% if recipe.has_all %}<strong>食材已找到，用量待确认</strong>{% else %}找到 {{ recipe.matched_count }} / {{ recipe.ingredient_count }} 种食材{% endif %}</p>
     <p class="small-note">所需：{{ recipe.ingredients|join:'、' }}</p>
     {% if recipe.missing %}<p class="small-note">还缺：{{ recipe.missing|join:'、' }}</p>{% endif %}
@@ -52,6 +52,8 @@
   </article>
   {% endfor %}
   <p class="small-note">这里的“已找到”只表示库存里有对应名称的可用批次；请自行核对真实份量和食材状况。</p>
+  {% elif active_category or query %}
+  <p class="empty-state">没有符合条件的菜谱。</p>
   {% endif %}
 </main>
 <script type="module" src="{% static 'js/recipe-search.js' %}"></script>

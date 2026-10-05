@@ -15,7 +15,8 @@
   </header>
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
   <nav class="home-options" aria-label="功能入口">
-    <a class="panel home-option" href="{% url 'inventory_page' %}"><h2>添加菜品</h2><p class="small-note">拍照或手动录入，查看与管理冰箱食材。</p></a>
+    <a class="panel home-option" href="{% url 'inventory_page' %}"><h2>添加菜品</h2><p class="small-note">拍照或手动录入食材。</p></a>
+    <a class="panel home-option" href="{% url 'inventory_list' %}"><h2>食材列表</h2><p class="small-note">查看与管理已添加食材。</p></a>
     <a class="panel home-option" href="{% url 'recipes_page' %}"><h2>查看菜谱</h2><p class="small-note">按库存找做法，生成或收藏家庭菜谱。</p></a>
     <a class="panel home-option" href="{% url 'shopping_page' %}"><h2>采购计划</h2><p class="small-note">核对现有食材，安排采购与确认入库。</p></a>
   </nav>

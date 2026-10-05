@@ -92,7 +92,7 @@ class TodayAndMobileTests(TestCase):
         response = self.client.get("/api/inventory/?q=苹果", secure=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual([item["name"] for item in response.json()["items"]], ["苹果"])
-        html = self.client.get("/inventory/?q=script", secure=True).content.decode()
+        html = self.client.get("/inventory/list/?q=script", secure=True).content.decode()
         self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", html)
         self.assertNotIn("<script>alert(1)</script>", html)
         self.assertEqual(self.client.get("/api/inventory/?q=" + "甲" * 81, secure=True).status_code, 422)

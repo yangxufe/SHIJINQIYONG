@@ -1,6 +1,6 @@
 "use strict";
 
-const page = document.querySelector("#inventory-page");
+const page = document.querySelector("#inventory-list-page");
 const searchForm = document.querySelector("#inventory-search");
 const queryInput = document.querySelector("#inventory-query");
 const searchState = document.querySelector("#search-state");
@@ -162,7 +162,7 @@ function bindForm(form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = form.querySelector('button[type="submit"]');
-    const state = form.querySelector(".submit-state");
+    const state = form.querySelector(".submit-state:not(#photo-state)");
     const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
     if (!button || !state || !csrf) return;
     if (pendingPayload === null) pendingPayload = formPayload(form);
@@ -220,7 +220,7 @@ async function committed(form, state) {
   state.dataset.state = "success";
   state.textContent = "已保存，正在读取最新列表…";
   if (!page) {
-    window.location.assign("/inventory/");
+    window.location.assign("/inventory/list/");
     return;
   }
   if (form.dataset.inventoryKind === "create") {
