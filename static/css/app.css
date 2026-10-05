@@ -135,4 +135,5 @@ button:disabled { opacity: .7; cursor: progress; }
 .shopping-page select { appearance: none; -webkit-appearance: none; height: 2.75rem; padding: .55rem 2.75rem .55rem .65rem; background-color: #fff; background-image: url("../img/select-chevron.svg"); background-repeat: no-repeat; background-origin: border-box; background-position: right 1rem center; background-size: .75rem .75rem; }
 .fields .shopping-check { display: flex; grid-column: 1 / -1; align-items: flex-start; gap: .55rem; }
 .shopping-add-submit { grid-column: 1 / -1; justify-self: start; }
+.shopping-stock-link { white-space: nowrap; }
 @media (forced-colors: active) { .shopping-page select { appearance: auto; background-image: none; } }

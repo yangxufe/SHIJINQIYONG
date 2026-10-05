@@ -50,7 +50,7 @@
   </section>
 
   <section class="panel" aria-labelledby="stock-heading"><h2 id="stock-heading">冰箱中可用的食材</h2>
-    <p class="small-note">仅统计未过期的食材；已过期的食材请到“<a href="{% url 'inventory_list' %}">已添加食材</a>”查看</p>
+    <p class="small-note">仅统计未过期的食材；已过期的食材请到“<a class="shopping-stock-link" href="{% url 'inventory_list' %}">已添加食材</a>”查看</p>
     {% for row in available %}<p class="shopping-stock-row">{{ row.name }} · {{ row.quantity }} {{ row.unit_label }}</p>{% endfor %}
   </section>
   <section aria-labelledby="history-heading"><h2 id="history-heading">最近记录</h2>
