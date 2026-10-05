@@ -12,7 +12,9 @@
 
 **复测及部署：**修复后 `manage.py test tests.test_third_optimization tests.test_stage06 --settings=config.settings.test --noinput` 15 项通过（1.450 秒、退出码 0）；此前完整 121 项结果沿用，没有冒充再次全量执行。安全停止 Waitress 后 collectstatic 复制 1 个、8 个未变化、后处理 8 个，任务重启；指纹 CSS 含新规则，11 项本机运行检查再次通过，20 张生产账号/业务表仍与本轮私有备份逐行一致。无迁移、新依赖、权限、库存服务、网络或 CA 变更。正式 Waitress 仅 127.0.0.1:8000；独立测试 8766 服务已停止，合成账号已退出，临时视口恢复。
 
-**证据及边界：**真实截图 outputs/third-optimization-shopping-390.png、third-optimization-shelf-life-390.png、third-optimization-stock-link-390.png，以及 third-optimization-browser-checks.json 布局测量仅本机保留、不入库。此次第三次优化网页验收已完成；不代表 Android 原生相机、真实手机/Mac、CA 信任、模型联调、新性能压测或阶段 08 完整发布通过。证书工作继续按用户要求暂缓。本轮修复与验收文档继续同步 GitHub；后续若有新问题可直接提交下一份清单。
+**证据及边界：**真实截图 outputs/third-optimization-shopping-390.png、third-optimization-shelf-life-390.png、third-optimization-stock-link-390.png，以及 third-optimization-browser-checks.json 布局测量仅本机保留、不入库。此次第三次优化网页验收已完成；不代表 Android 原生相机、真实手机/Mac、CA 信任、模型联调、新性能压测或阶段 08 完整发布通过。证书工作继续按用户要求暂缓；后续若有新问题可直接提交下一份清单。
+
+**GitHub 实际同步：**推送前 fetch 为 0 落后/0 领先，仅明确暂存 6 个源码与验收文档文件，diff 和凭据模式检查通过。修复提交 1f9108bb02458beb27b4e485fb76627fd4db19b4 已 push 至 main，ls-remote 返回同一 SHA；本同步记录随后另作文档提交。截图、合成测试库、私有备份与运行配置不上传，下载请取最新 main。
 
 ## 第三次优化问题清单（2026-10-05，首次实施记录）
 
