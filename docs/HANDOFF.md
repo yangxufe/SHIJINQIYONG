@@ -6,7 +6,7 @@
 
 **本轮回退：**基线5a494b2，本地标记rollback-before-fourth-optimization-20261006，私有备份household-20261006-161951-7c00cf82（0附件）。新请求可能包含null，旧版本的比较逻辑不能处理；不能直接把整套旧代码配上有新请求的当前库。界面回退前先停机并做新备份，核对无未保存源码后，仅从基线恢复static/css/app.css、templates/core/login.html、templates/core/register.html、templates/meals/workbench.html、meals/workbench_forms.py、meals/workbench_views.py，**保留本轮meals/workbench.py和templates/meals/results.html的空值读取支持**；重新收集静态、检查旧/新请求、启动并核对数据。完整旧版恢复只可先在独立目录验证备份，需保护备份之后新增的真实数据，不能用旧库覆盖当前库来回退界面。
 
-Android证书工作按用户要求暂缓，本轮未执行真实模型联调/实机/新压测，不代表阶段08完整发布。下一步可直接提交新的问题清单；如专门复测手机，请另行恢复CA信任验收。
+代码提交6e3bb8018147bea057df076268d865236d6b779d已推送GitHub main并核对远端，此同步记录另随文档提交，下载请取最新main。Android证书工作按用户要求暂缓，本轮未执行真实模型联调/实机/新压测，不代表阶段08完整发布。下一步可直接提交新的问题清单；如专门复测手机，请另行恢复CA信任验收。
 
 ## 2026-10-05 第三次优化交接（历史）
 

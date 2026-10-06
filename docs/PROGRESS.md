@@ -14,7 +14,7 @@
 
 **部署：**安全停止Waitress后生产migrate无待执行项；collectstatic复制1个、8个未变、后处理8个文件，重启任务Running。只读work/fourth_optimization_deploy_check.py实测20张账号业务表与本轮备份逐行相同、integrity_check=ok、外键问题0；11项本机代理头HTTP检查通过，no-store/CSP保持，3个既有JS/SVG指纹资源与源码一致，CSS包含新规则且引用指纹SVG。check --deploy仅原security.W004，未屏蔽；测试8767端口已关闭。无新依赖/迁移，不修改库存事务、账号、YOLO、Caddy、CA、网络或防火墙；Android证书工作继续暂停。真实模型联调、Android/macOS实机、新性能压测和阶段08完整发布验收本轮未执行。回退须保留对新null条件的读取支持，具体见HANDOFF，不能覆盖真实库回退界面。
 
-**GitHub同步：**fetch核对0落后、1领先（本轮设计提交）；本轮源码/测试/文档待明确暂存、检查后推送，完成后补记远端核对结果。
+**GitHub同步：**fetch核对0落后、1领先（本轮设计提交）；明确暂存18个源码/测试/文档文件，正常仓库换行配置下diff --check和cached检查通过，私有路径/文件类型/凭据模式检查未发现匹配。代码提交6e3bb8018147bea057df076268d865236d6b779d已推送yangxufe/SHIJINQIYONG的main，ls-remote核对同一SHA，包含设计提交dac39a3。此同步记录随后另作文档提交；下载请取最新main。真实库、备份、日志、配置、截图和合成账号数据未上传。
 
 ## 第三次优化浏览器补验（2026-10-05）
 
