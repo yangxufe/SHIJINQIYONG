@@ -1,5 +1,21 @@
 # 食尽其用实施进度
 
+## 第四次优化问题清单（2026-10-06）
+
+依据用户第四次 DOCX 的四项要求实施。开始时工作树干净，基线 5a494b2；本地回退标记 rollback-before-fourth-optimization-20261006。实际停止 Waitress 并备份 household-20261006-161951-7c00cf82（0 附件）后恢复任务；真实数据库及备份不上传。设计见 plans/2026-10-06-fourth-optimization-design.md。
+
+**代码和合同：**共用 CSS 将普通/已访问链接设为继承文字色、无下划线，保留按钮、焦点轮廓和现有视觉样式。登录底部仅保留“注册新账号 / 返回首页”，注册为“登录已有账号 / 返回首页”，后者仍到公开 /welcome/。原采购下拉的本地 SVG 箭头规则扩展到全站单选，包含动态创建的 select；多选列表不添加假箭头，高对比模式使用原生箭头。菜谱条件仅人数、安排方式、食材模式、口味模式四项可见必填加星号；耗时/辣度/经验可空。耗时与辣度存 null、经验存空串，不偷偷填30分钟或新手；时间为空不加时间排序惩罚，辣度为空仍遵守已存限制，显式0保留。勾选“时间是否必须满足”却没有耗时会提示条件冲突。checkbox 在文字前同一行，结果摘要如实显示空条件；系统请求号、外部发送授权、器材/过敏/库存硬检查保持。
+
+**实际自动化：**新增 tests/test_fourth_optimization.py 7 项，覆盖四项提交、幂等和409冲突、私人结果404、CSRF403、范围/必填422、空时间语义、辣度0及已有硬限制、器材缺失、自然语言确认、旧条件兼容、无库存采购写副作用。首轮47项有1项测试正则遗漏 label 的 for 属性而失败，修正定位表达式后执行完整回归：`manage.py test tests --settings=config.settings.test --noinput` **128 项通过，17.103 秒，退出码0**，保留原真实文件 SQLite 并发测试。`makemigrations --check --dry-run --settings=config.settings.test` 无变化。
+
+**浏览器实测：**独立 work/fourth-optimization-ui 合成库、loopback 8767；登录/注册四条页脚链接实点及正常登录/退出通过。只填四项提交进入独立候选页，空人数被浏览器拦截，时间空值冲突可取消后提交；未配置模型如实降级，无器材不编造可执行菜谱。刷新后仅1条 RecipeRequest，0生成任务/库存/流水/动作/采购项。随后额外通过添加页创建1个合成批次，搜索返回动态库存表单；查看编辑、采购和返回入口。
+
+登录、注册、菜谱、工作台、候选、添加、动态列表、编辑、采购共9页各测320/390/1280宽度，27组均无横向溢出。单选框高44px、图标12px、距右16px、右内边距44px；工作台时间勾选在文字左侧、间距8px、中心差约0.005px。普通文字链接颜色与所在正文/说明一致、无下划线；四星号和三项可空默认值实际核对。控制台读取未返回 error/warn。截图 fourth-optimization-login-390.png、fourth-optimization-workbench-390.png、fourth-optimization-shopping-1280.png 及 fourth-optimization-browser-checks.json 存在本机 outputs，不提交。测试账号已退出，测试标签已关闭、视口已恢复。
+
+**部署：**安全停止Waitress后生产migrate无待执行项；collectstatic复制1个、8个未变、后处理8个文件，重启任务Running。只读work/fourth_optimization_deploy_check.py实测20张账号业务表与本轮备份逐行相同、integrity_check=ok、外键问题0；11项本机代理头HTTP检查通过，no-store/CSP保持，3个既有JS/SVG指纹资源与源码一致，CSS包含新规则且引用指纹SVG。check --deploy仅原security.W004，未屏蔽；测试8767端口已关闭。无新依赖/迁移，不修改库存事务、账号、YOLO、Caddy、CA、网络或防火墙；Android证书工作继续暂停。真实模型联调、Android/macOS实机、新性能压测和阶段08完整发布验收本轮未执行。回退须保留对新null条件的读取支持，具体见HANDOFF，不能覆盖真实库回退界面。
+
+**GitHub同步：**fetch核对0落后、1领先（本轮设计提交）；本轮源码/测试/文档待明确暂存、检查后推送，完成后补记远端核对结果。
+
 ## 第三次优化浏览器补验（2026-10-05）
 
 用户手动打开内置浏览器测试登录页后，原 data: 页面阻断解除。基线 f51716c，开始时工作树干净；在既有 work/third-optimization-ui 独立合成库中完成实际浏览器操作，未登录或写入生产家庭数据。下面首次实施段落中的“浏览器未完成”是补验前状态。

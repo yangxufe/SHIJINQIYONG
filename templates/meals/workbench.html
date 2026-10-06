@@ -11,7 +11,11 @@
   <form method="post" action="{% if confirmed or direct %}{% url 'workbench_confirm' %}{% else %}{% url 'workbench_page' %}{% endif %}" class="panel">
     {% csrf_token %}{{ form.request_id }}
     {% if form.non_field_errors %}<div class="error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-    {% for field in form.visible_fields %}{% if not direct or field.name != 'raw_text' %}<div class="form-row"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="small-note">{{ field.help_text }}</p>{% endif %}{% if field.errors %}<p class="error">{{ field.errors }}</p>{% endif %}</div>{% endif %}{% endfor %}
+    {% for field in form.visible_fields %}{% if not direct or field.name != 'raw_text' %}<div class="form-row">
+      {% if field.name == 'must_meet_time' %}<label class="condition-check" for="{{ field.id_for_label }}">{{ field }}<span>{{ field.label }}</span></label>
+      {% else %}<label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</label>{{ field }}{% endif %}
+      {% if field.help_text %}<p class="small-note">{{ field.help_text }}</p>{% endif %}{% if field.errors %}<p class="error">{{ field.errors }}</p>{% endif %}
+    </div>{% endif %}{% endfor %}
     {% if direct %}<input type="hidden" name="generate" value="yes">
       {% if configured_provider == 'openai' %}<label class="shopping-check"><input type="checkbox" name="external_consent" required>同意将本次条件与必要食材名称、数量发送给管理员配置的外部模型；不发送账号、Cookie 或整库。</label>{% endif %}
     {% endif %}

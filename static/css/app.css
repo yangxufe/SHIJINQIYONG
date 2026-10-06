@@ -1,6 +1,7 @@
 :root { color-scheme: light; font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif; }
 * { box-sizing: border-box; }
 body { margin: 0; background: #f5f7f2; color: #1f3326; }
+a, a:visited { color: inherit; text-decoration: none; }
 .page { width: min(100%, 38rem); min-height: 100vh; margin: 0 auto; padding: 4rem 1.5rem; }
 h1 { font-size: clamp(2.25rem, 9vw, 3.5rem); line-height: 1.1; margin: 1rem 0; }
 p { font-size: 1.1rem; line-height: 1.7; }
@@ -36,7 +37,7 @@ h3 { margin: .2rem 0; font-size: 1.2rem; }
 .empty-state { padding: 1rem; border-radius: .75rem; background: #e8efe5; font-size: .98rem; }
 .toolbar, .account-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
 .secondary-button { background: #e4ece2; color: #1f3326; border: 1px solid #6b826e; }
-.text-button { background: transparent; color: #315b3b; text-decoration: underline; }
+.text-button { background: transparent; color: #315b3b; text-decoration: none; }
 .search-form { margin: .75rem 0 1rem; }
 .search-form label { display: block; margin-bottom: .35rem; }
 .search-row { display: flex; align-items: stretch; gap: .5rem; }
@@ -132,8 +133,10 @@ button:disabled { opacity: .7; cursor: progress; }
 .save-lot-row button { margin: 0; flex: 0 0 auto; }
 .save-lot-row .small-note { flex: 1 1 12rem; line-height: 1.5; }
 #recipes-page a { color: inherit; text-decoration: none; }
-.shopping-page select { appearance: none; -webkit-appearance: none; height: 2.75rem; padding: .55rem 2.75rem .55rem .65rem; background-color: #fff; background-image: url("../img/select-chevron.svg"); background-repeat: no-repeat; background-origin: border-box; background-position: right 1rem center; background-size: .75rem .75rem; }
+select:not([multiple]):not([size]), select[size="1"]:not([multiple]) { appearance: none; -webkit-appearance: none; height: 2.75rem; padding: .55rem 2.75rem .55rem .65rem; background-color: #fff; background-image: url("../img/select-chevron.svg"); background-repeat: no-repeat; background-origin: border-box; background-position: right 1rem center; background-size: .75rem .75rem; }
 .fields .shopping-check { display: flex; grid-column: 1 / -1; align-items: flex-start; gap: .55rem; }
 .shopping-add-submit { grid-column: 1 / -1; justify-self: start; }
 .shopping-stock-link { white-space: nowrap; }
-@media (forced-colors: active) { .shopping-page select { appearance: auto; background-image: none; } }
+.form-row > .condition-check { display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
+.form-row .condition-check input[type="checkbox"] { flex: 0 0 auto; margin: 0; }
+@media (forced-colors: active) { select:not([multiple]):not([size]), select[size="1"]:not([multiple]) { appearance: auto; background-image: none; } }

@@ -107,6 +107,8 @@ JSON 写请求必须使用 `Content-Type: application/json`，并从页面隐藏
 
 ## 阶段 07A 菜谱工作台与生成任务
 
+2026-10-06 表单合同补充：`people`、`meal_type`、`stock_mode`、`taste_mode` 四个可见用餐字段必填。隐藏 UUID `request_id` 和 CSRF 继续必需；其他用餐字段可不传或留空，但填值仍校验范围和格式。`max_minutes` 空时存 null，有值为 5–1440 整数；`spice_max` 空时存 null，有值为 0–5 整数；`skill` 空时存空串，有值仍限既有枚举。`must_meet_time=on` 且时间空时返回422并解释冲突。null不等于0；0辣度不得丢失。未填写耗时不加排序惩罚，未填本餐辣度仍遵守已保存限制。旧有值条件继续正常读取，无迁移。外部模型授权仍单独检查，未选器材仍可能没有可执行结果；幂等/对象权限/采购及库存接口保持不变。
+
 以下为登录家庭成员的同源 HTML 页面与表单，不使用 JWT，也不接受浏览器提供的模型 URL。所有 POST 均由 Django CSRF 检查；动态响应 `no-store`。
 
 | 方法与路径 | 行为 |

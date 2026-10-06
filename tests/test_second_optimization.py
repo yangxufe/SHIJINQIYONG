@@ -110,7 +110,7 @@ class SecondOptimizationTests(TestCase):
             self.assertContains(response, 'class="password-control"', count=count)
             self.assertContains(response, 'js/password-peek.js')
             self.assertNotContains(response, 'class="brand-script"')
-            self.assertContains(response, 'href="/welcome/">返回封面')
+            self.assertContains(response, 'href="/welcome/">返回首页')
         self.assertContains(anonymous.get("/register/", secure=True), 'maxlength="10"')
         self.assertContains(anonymous.get("/register/", secure=True), 'minlength="8"', count=2)
 

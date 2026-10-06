@@ -4,7 +4,7 @@
 {% include 'core/header_actions.html' %}
   {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
   <h1>符合条件的候选</h1>
-  <section class="panel"><h2>已确认的条件</h2><p>{{ conditions.people }} 人 · {% if conditions.stock_mode == 'strict' %}严格只用现有食材{% else %}允许补购{% endif %} · 最多 {{ conditions.max_minutes }} 分钟 · 辣度上限 {{ conditions.spice_max }}</p>
+  <section class="panel"><h2>已确认的条件</h2><p>{{ conditions.people }} 人 · {% if conditions.stock_mode == 'strict' %}严格只用现有食材{% else %}允许补购{% endif %} · {% if conditions.max_minutes != None %}{% if conditions.must_meet_time %}最多{% else %}希望{% endif %} {{ conditions.max_minutes }} 分钟{% else %}本次未限定时间{% endif %} · {% if conditions.spice_max != None %}本餐辣度上限 {{ conditions.spice_max }}{% else %}本次未新增辣度上限{% endif %}</p>
     <p class="small-note">营养方向：{{ conditions.goals|join:'、'|default:'未设置' }}。模型不会把“健身”改写成减脂目标。</p>
     {% if inventory_changed %}<p class="notice">冰箱已变化；以下分配按当前库存重新计算，选定菜单和实际使用时还会复核。</p>{% endif %}
     {% if participants_need_manual_check %}<p class="notice">部分同餐成员没有授权共享限制。请向本人核对过敏和禁食要求，再决定是否制作；系统不会读取其私人配置。</p>{% endif %}

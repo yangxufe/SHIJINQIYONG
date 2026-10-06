@@ -46,8 +46,7 @@ def _provider_kind():
 def workbench_page(request):
     if request.method == "GET":
         text = request.GET.get("raw_text", "")[:600]
-        form = RecipeConditionsForm(initial={"request_id": uuid4(), "people": 2, "max_minutes": 30,
-                                              "spice_max": 1, "raw_text": text})
+        form = RecipeConditionsForm(initial={"request_id": uuid4(), "people": 2, "raw_text": text})
         direct = request.GET.get("direct") == "1"
         provider = _provider_kind() if direct else ""
         return render(request, "meals/workbench.html", {"form": form, "confirmed": False,

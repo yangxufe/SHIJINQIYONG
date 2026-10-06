@@ -64,12 +64,15 @@ def validate_conditions(raw):
         raise ValueError("用餐人数应为1至12人")
     if raw["meal_type"] not in {"single", "menu"} or raw["stock_mode"] not in {"strict", "buy"} or raw["taste_mode"] not in {"usual", "gentle", "explore"}:
         raise ValueError("用餐、食材或口味模式无效")
-    if raw["skill"] not in {"beginner", "regular", "experienced"}:
+    if raw["skill"] not in {"", "beginner", "regular", "experienced"}:
         raise ValueError("熟练程度无效")
-    if type(raw["max_minutes"]) is not int or not 5 <= raw["max_minutes"] <= 1440 or type(raw["spice_max"]) is not int or not 0 <= raw["spice_max"] <= 5:
-        raise ValueError("时间或辣度无效")
+    for key, lower, upper in (("max_minutes", 5, 1440), ("spice_max", 0, 5)):
+        if raw[key] is not None and (type(raw[key]) is not int or not lower <= raw[key] <= upper):
+            raise ValueError("时间或辣度无效")
     if type(raw["must_meet_time"]) is not bool:
         raise ValueError("时间约束无效")
+    if raw["must_meet_time"] and raw["max_minutes"] is None:
+        raise ValueError("已选择时间必须满足，请填写希望总耗时，或取消该勾选。")
     if not isinstance(raw["raw_text"], str) or len(raw["raw_text"]) > 600:
         raise ValueError("需求文字无效")
     for key, maximum in (("goals", 8), ("excluded", 20), ("equipment", 15), ("priority_names", 12), ("participants", 12)):
@@ -227,7 +230,8 @@ def evaluate_menu(specs, *, servings, conditions, actor=None, lots=None):
     for spec in specs:
         if any(canonical_name(row["name"]) in forbidden for row in spec["ingredients"]):
             blockers.append(f"{spec['title']}含本餐排除或共享禁食食材")
-        if spec["spice_level"] > min(conditions["spice_max"], taste.get("spice_max", 5)):
+        spice_limit = conditions["spice_max"] if conditions["spice_max"] is not None else 5
+        if spec["spice_level"] > min(spice_limit, taste.get("spice_max", 5)):
             blockers.append(f"{spec['title']}超过明确辣度上限")
         missing_equipment = sorted(set(spec["equipment"]) - set(conditions["equipment"]))
         if missing_equipment:
@@ -279,7 +283,8 @@ def evaluate_menu(specs, *, servings, conditions, actor=None, lots=None):
         taste_points = 5 if explore and conditions["explore_cuisine"] else (2 if explore else -1)
     else:
         taste_points = 3 if liked else (-2 if cuisine in taste.get("disliked_cuisines", []) else 0)
-    score = int(priority_progress * 10) + int(coverage * 10) + taste_points - (len(gaps) * 4) - max(0, specs[0]["total_minutes"] - conditions["max_minutes"]) // 10
+    time_penalty = max(0, specs[0]["total_minutes"] - conditions["max_minutes"]) // 10 if conditions["max_minutes"] is not None else 0
+    score = int(priority_progress * 10) + int(coverage * 10) + taste_points - (len(gaps) * 4) - time_penalty
     reasons = []
     if priority_used:
         reasons.append(f"已使用{priority_used}个优先批次，仍需核对各批次剩余量")
