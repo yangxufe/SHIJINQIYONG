@@ -1,4 +1,5 @@
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.urls import reverse_lazy
 from django.contrib import messages
 from django.core import signing
 from django.db import IntegrityError, OperationalError, transaction
@@ -17,6 +18,24 @@ from inventory.services import _is_busy
 
 login_view = LoginView.as_view(template_name="core/login.html", redirect_authenticated_user=True)
 logout_view = LogoutView.as_view(next_page="login")
+
+
+class MemberPasswordChangeView(PasswordChangeView):
+    template_name = "core/password_change.html"
+    success_url = reverse_lazy("household_settings")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "密码已更新，本次登录保留，其他设备的旧登录将失效。")
+        return response
+
+
+password_change_view = MemberPasswordChangeView.as_view()
+
+
+@require_GET
+def account_help(request):
+    return render(request, "core/account_help.html")
 
 
 @require_GET
@@ -81,11 +100,20 @@ def household_settings(request):
         if not has_role(request.user, "admin"):
             from django.core.exceptions import PermissionDenied
             raise PermissionDenied
-        if (set(request.POST) - {"csrfmiddlewaretoken", "create_invitation"}
-                or any(len(request.POST.getlist(key)) != 1 for key in request.POST)
-                or request.POST.get("create_invitation") != "yes"):
+        if any(len(request.POST.getlist(key)) != 1 for key in request.POST):
             error = "设置表单无效。"
-        else:
+        elif set(request.POST) <= {"csrfmiddlewaretoken", "revoke_invitation"} and request.POST.get("revoke_invitation"):
+            from uuid import UUID
+            try:
+                identifier = UUID(request.POST["revoke_invitation"])
+            except (ValueError, TypeError):
+                error = "邀请编号无效。"
+            else:
+                MemberInvitation.objects.filter(pk=identifier, used_by__isnull=True,
+                    expires_at__gt=timezone.now()).update(expires_at=timezone.now())
+                messages.success(request, "该邀请已失效，无法再用于注册。")
+                return redirect("household_settings")
+        elif set(request.POST) <= {"csrfmiddlewaretoken", "create_invitation"} and request.POST.get("create_invitation") == "yes":
             with transaction.atomic():
                 if MemberInvitation.objects.filter(used_by__isnull=True, expires_at__gt=timezone.now()).count() >= 20:
                     error = "已有 20 个有效邀请，请先使用或等待过期。"
@@ -93,8 +121,13 @@ def household_settings(request):
                     invitation = MemberInvitation.objects.create(created_by=request.user,
                         expires_at=timezone.now() + timedelta(hours=24))
                     token = signing.dumps(str(invitation.pk), salt=INVITATION_SALT)
+        else:
+            error = "设置表单无效。"
     return render(request, "core/settings.html", {"household": HouseholdSettings.objects.first(),
-        "invitation_token": token, "error": error}, status=422 if error else 200)
+        "invitation_token": token, "error": error,
+        "active_invitations": MemberInvitation.objects.filter(used_by__isnull=True,
+            expires_at__gt=timezone.now()).select_related("created_by").order_by("-created_at")[:20]
+            if has_role(request.user, "admin") else []}, status=422 if error else 200)
 
 
 @admin_required

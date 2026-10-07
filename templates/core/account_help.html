@@ -1,0 +1,7 @@
+{% load static %}
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>账号帮助 · 食尽其用</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><main class="page"><h1>账号帮助</h1>
+<section class="panel"><h2>首次使用</h2><p>在运行应用的 Windows 电脑上双击 Start-Windows.cmd，按提示创建家庭管理员。没有默认账号或默认密码。</p></section>
+<section class="panel"><h2>加入已有家庭</h2><p>请管理员在“家庭设置”生成邀请码，再到注册页面创建自己的账号。邀请码 24 小时内有效，使用一次或撤销后失效。</p></section>
+<section class="panel"><h2>忘记密码或被锁定</h2><p>联系运行应用的电脑持有者，在 Start-Windows.cmd 中选择“账号维护”，按提示重设密码或解除登录锁定。密码恢复在本机执行，没有公开的密码重置入口。</p></section>
+<p><a href="{% url 'login' %}">返回登录</a> / <a href="{% url 'register' %}">注册</a></p></main></body></html>

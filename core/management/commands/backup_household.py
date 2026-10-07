@@ -35,7 +35,8 @@ def create_private_backup(database_path, media_dir, backups_dir):
     with closing(sqlite3.connect(database_copy)) as check:
         if check.execute("PRAGMA integrity_check").fetchone()[0] != "ok" or check.execute("PRAGMA foreign_key_check").fetchall():
             raise ValueError("Backed-up database failed integrity checks")
-        rows = check.execute("SELECT file_key, sha256 FROM meals_recipemedia ORDER BY file_key").fetchall()
+        media_table = check.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='meals_recipemedia'").fetchone()
+        rows = check.execute("SELECT file_key, sha256 FROM meals_recipemedia ORDER BY file_key").fetchall() if media_table else []
     copied = staging / "recipe_media"
     copied.mkdir()
     for key, expected_digest in rows:

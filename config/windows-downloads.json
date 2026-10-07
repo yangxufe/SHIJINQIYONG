@@ -1,0 +1,15 @@
+{
+  "checked_on": "2026-10-07",
+  "python": {
+    "version": "3.13.16",
+    "url": "https://api.nuget.org/v3-flatcontainer/python/3.13.16/python.3.13.16.nupkg",
+    "algorithm": "SHA256",
+    "hash": "95fad176338f1d6a799e45946488063f4aa61764e6cff2f132ddeffbf7a04c34"
+  },
+  "caddy": {
+    "version": "2.11.7",
+    "url": "https://github.com/caddyserver/caddy/releases/download/v2.11.7/caddy_2.11.7_windows_amd64.zip",
+    "algorithm": "SHA512",
+    "hash": "c308154504e53755958ffc62d8a2657ab17eefd6dd25c45dbb2c3d93d29519971f77ca652f7d0f2bcb7f980b9ba3822478865e29969d0272d7613550a43152b1"
+  }
+}

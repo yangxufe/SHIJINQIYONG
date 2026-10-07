@@ -1,5 +1,11 @@
 # 先吃：AI 编码执行约定
 
+## 2026-10-07 Windows 自动部署与账号维护
+
+新电脑入口 Start-Windows.cmd → scripts/windows_setup.ps1，面向 Windows 10/11 x64。官方 CPython NuGet 包和 Caddy 固定版本及散列校验，首次验证 Python 数字签名；依赖沿用 requirements.lock，不用嵌入式 Python 或云服务。私有数据、CA、配置、下载缓存和虚拟环境在 LOCALAPPDATA/ShiJinQiYong，目录仅当前用户/SYSTEM，默认本机 HTTPS。旧 data/runtime.env 与旧托管服务不自动接管或重置。
+
+初次管理员在启动前由本机控制台使用 Django UserCreationForm 创建；网页仍邀请制。本人改密使用 Django PasswordChangeView，保留当前会话并使其他旧会话失效；管理员可撤销邀请。开放 LAN、安装 CA 信任及 UAC 必须由运行脚本的人分别确认，不自动降低安全。部署/运行使用同实例互斥锁；代码/依赖变更前备份，保留兼容迁移；Windows Job 在控制器退出时终止本轮进程树。手机根信任仍须人工完成，不能宣称任意设备都已验收。
+
 你是在用户本机项目内工作的实现工程师。不要只给建议或伪代码；有文件和终端工具时，完成当前阶段的代码、迁移、测试与文档。没有工具时输出完整文件与待执行命令，不伪造运行结果。
 
 ## 必须继承的架构

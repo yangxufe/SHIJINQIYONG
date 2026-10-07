@@ -1,5 +1,7 @@
 # 食尽其用
 
+**Windows 新电脑：下载 ZIP、完整解压，双击 `Start-Windows.cmd`。** 自动准备独立 Python、依赖、Caddy、SQLite 和 YOLO，首次按提示创建管理员。支持 Windows 10/11 x64；详细安装、注册、局域网和恢复步骤见 [Windows 教程](docs/WINDOWS.md)。首次下载安装需联网，本机 CA 信任和局域网 UAC 由用户确认。
+
 第四次优化（2026-10-06）：普通链接取消紫色/下划线，登录注册底部入口与全站下拉箭头统一；菜谱要求仅四项可见必填，耗时、辣度和经验可空。完整回归128项及九页三宽度浏览器检查通过，具体证据和边界见 [实施进度](docs/PROGRESS.md)。
 
 Windows 已安装主机的日常启动及新 Windows 电脑的独立安装见 [Windows 启动教程](docs/WINDOWS.md)；macOS 见 [Mac 安装与局域网访问说明](docs/MACOS.md)。新电脑会建立**自己的**数据库、成员账号与 HTTPS 证书；源码仓库不含原电脑的家庭数据或证书私钥。
@@ -10,7 +12,7 @@ Windows 已安装主机的日常启动及新 Windows 电脑的独立安装见 [W
 
 ## 本机运行
 
-安装依赖：`.\.venv\Scripts\python.exe -m pip install -r requirements.lock`（隔离环境已经创建）。生产配置由 `data/runtime.env` 提供；首次初始化运行 `scripts/initialize_runtime.ps1`，已有配置不会被覆盖。
+安装依赖：`.\.venv\Scripts\python.exe -m pip install -r requirements.lock`（隔离环境已经创建）。以下是旧版安装的管理入口；新电脑使用上述双击脚本。旧生产配置由 `data/runtime.env` 提供，初始化脚本需显式传入本机可信 `-LanIp` 和 `-TimeZone`，已有配置不会被覆盖。
 
 - 检查：`& scripts/manage_prod.ps1 check`
 - 迁移：`& scripts/manage_prod.ps1 migrate --noinput`

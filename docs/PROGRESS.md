@@ -1,5 +1,32 @@
 # 食尽其用实施进度
 
+## Windows 自动部署与账号完善（2026-10-07）
+
+开始工作树干净，基线 `ce06d3d75f207886796cb60c498b1333778b6be4`，本地回退标记 `rollback-before-windows-installer-20261007`；设计提交 `a862d72`。实现面向 Windows 10/11 x64，不把本机隔离演练写成任意新电脑的实机验收。原家庭服务、数据库、CA 和防火墙没有重新部署或修改；旧服务仍沿用自己的数据路径。
+
+**实现：**根目录 `Start-Windows.cmd` 调用系统 Windows PowerShell 5.1；即使由 PowerShell 7 启动，也使用正确的系统模块路径。`windows_setup.ps1` 校验平台、目录、ACL、空间及实例互斥锁，下载固定官方 CPython NuGet 3.13.16/Caddy 2.11.7，核对散列及首次 Python 签名，创建独立依赖环境、执行锁定安装及 DLL 检查。VC++ 缺失时有经 Microsoft 签名验证的官方安装路径。`windows_runtime.py` 管理私有配置/端口、代码变更前完整备份、兼容迁移、静态文件、YOLO 安装和 Waitress/Caddy 生命周期；Windows Job 约束本轮进程树。默认 loopback HTTPS，LAN 模式显式选择网卡、确认子网和 UAC，并持续检测网络变化。没有新增系统常驻任务或自动开放未知网络。
+
+**账号：**首个管理员通过控制台 Django UserCreationForm 创建，无默认密码；已有账号不重新初始化。网页保留一次性邀请注册，增加管理员撤销邀请、本人改密、登录错误保留账号输入和公开账号帮助。本人改密沿用 Django PasswordChangeView，当前会话保留、其他旧会话失效；忘记密码/解锁/启停账号通过本机维护菜单复用 manage_member。权限、CSRF、CSP、原库存与采购事务未改变，没有模型或迁移文件变化。
+
+**实际测试：**
+
+| 验证 | 结果 |
+|---|---|
+| 完整原回归及本轮新增 | 原 Python 3.10：140 项、41.044 秒；新安装 Python 3.13.16：140 项、40.292 秒，均退出码 0。包含原 SQLite 并发测试。本轮新增 12 项账号/隔离/备份测试，修正后单独运行 2.590 秒、2.645 秒均通过；最终补强控制器对继承环境变量的清理后，12 项再测 2.844 秒通过，根 cmd 严格 HTTPS 再测成功。 |
+| 迁移/依赖/安全 | 无模型迁移差异；空库全部 migrate 成功，重复启动无待执行项；24 项锁定依赖安装与 pip check 通过，Django/Waitress/Argon2/Pillow/ONNX Runtime/NumPy 实际导入成功；check --deploy 仅保留原 security.W004。 |
+| 真实隔离安装 | 新目录 ShiJinQiYong-InstallTest-20261007，实际下载校验 Python/Caddy、创建 venv、安装模型、收集资源。本机已有其他 Python，但启动器使用自己下载的 Python 3.13.16（SQLite 3.50.4，继续 DELETE 模式）。不依赖旧 .venv 或 Git。 |
+| 双击入口同等调用 | 实际执行 Start-Windows.cmd -Mode Smoke；修复系统模块路径后严格校验证书链/主机名，localhost 健康页通过，SMOKE_OK，按键退出码 0。非交互测试不创建账号、不导入 CA、不开放 LAN。 |
+| 交互首个账号/生命周期 | 真实终端创建合成家庭及管理员，密码输入无回显；重复启动被互斥锁拒绝。CA 提示选择不信任；Ctrl+C 后本轮后端 8800 和 loopback 8443 释放，原 LAN 8443 保留。 |
+| 真实 HTTPS 账号 BVT | 15 项通过：健康、匿名 401、CSRF 403、管理员登录/邀请、成员注册、重复邀请码拒绝、成员改密、当前会话保留/其他会话失效、越权邀请拒绝、no-store、指纹资源 immutable、POST 退出。连接使用独立公开 CA 严格校验，无 verify=False。 |
+| 更换源码目录 | 202 个源码文件复制到含中文/空格的新目录，不含 .git/.venv/data/runtime.env；以原独立 profile 启动并完成严格 HTTPS 烟测。7 张账号/业务表、2 个合成账号、profile 与 CA 散列保持一致，完整性及外键通过。 |
+| 重复准备/备份恢复 | 相同代码再次 Prepare，备份目录数量 4→4；备份在另一个独立目录恢复，SQLite 完整性/外键通过，清除恢复副本旧会话后合成账号实际密码登录及四个业务页面 200。该备份附件数 0，不冒充实际媒体文件恢复验收。 |
+
+真实运行脚本及合成结果仅位于被忽略的 work/ 与 LOCALAPPDATA 测试 profile；没有把账号密码、Cookie、数据库、私有配置、备份或 CA 私钥提交仓库。进程终止演练使用正常 Ctrl+C/烟测收尾；强制关闭控制台的 Job 退出保障已实现，但本轮没有额外声称人工点叉实测。
+
+**失败与修正：**初次 25 项针对性测试中一项 SQLite 连接未关闭，Windows 无法删除临时目录；改为 contextlib.closing 后通过。最初官方 Python MSI 在当前 MSIX 宿主出现 PackageCache 路径重定向错误 0x80070003，改用 Python 官方 NuGet 包并验证签名/散列后完成真实安装。旧 Set-Acl 在重复调用时要求 SeSecurityPrivilege，改为 icacls 收紧当前用户/SYSTEM 权限并 Get-Acl 核验。最终 cmd 调用暴露 PowerShell 7 模块路径污染，显式使用系统 Windows PowerShell 和模块目录后通过；没有关闭安全校验来掩盖失败。
+
+**文档和边界：**更新 AGENTS、架构、API、安全、来源、Windows 教程、交接、BVT 与验收。另一台全新 Windows 实机、VC++ 缺失环境、UAC 防火墙写入、系统 CA 导入、Android 信任、整机重启/断网现场、新性能压测和真实模型均**未执行**。本轮不接管旧服务；原 Android CA 问题仍按用户要求暂停，阶段 08 完整发布仍未通过。新电脑首次需要正常联网下载；证书信任和可信网络由主机持有者确认。完整使用、更新与恢复见 WINDOWS.md，不承诺企业策略/ARM64/32 位均可运行。
+
 ## 芝士白与三色点缀（2026-10-06）
 
 用户明确指定四个色值。开始工作树干净、基线67ec46f，本地回退标记rollback-before-food-palette-20261006；设计提交0dd19b0，见plans/2026-10-06-food-palette-design.md。本轮仅修改static/css/app.css和static/img/select-chevron.svg及相关记录，没有模板/JS/后端/路由/迁移变化。

@@ -1,5 +1,9 @@
 # 官方资料与查证范围
 
+## Windows 自动安装查证（2026-10-07）
+
+[Python 官方 NuGet 运行环境](https://docs.python.org/3.13/using/windows.html#the-nuget-org-packages)、[CPython 3.13.16 包与维护者](https://www.nuget.org/packages/python/3.13.16)、[Python 3.13.16 发行说明](https://www.python.org/downloads/release/python-31316/)、[Caddy v2.11.7 发行及校验文件](https://github.com/caddyserver/caddy/releases/tag/v2.11.7)、[Caddy 内部 HTTPS](https://caddyserver.com/docs/automatic-https)。运行包版本及散列见 config/windows-downloads.json；Python 包实际 HTTPS 下载后计算 SHA-256，并校验内部 python.exe 的 Python Software Foundation Authenticode；Caddy使用发行方 SHA-512。
+
 ## 阶段 07A 补充查证（2026-09-26）
 
 macOS 本机运行与局域网 HTTPS 的资料（2026-09-26）：[Caddy Mac 安装](https://caddyserver.com/docs/install)、[Caddy 本地 CA 与其他设备信任](https://caddyserver.com/docs/automatic-https)、[Caddyfile 环境变量](https://caddyserver.com/docs/caddyfile/concepts)、[Caddy remote_ip 匹配](https://caddyserver.com/docs/caddyfile/matchers)、[Waitress 监听地址](https://docs.pylonsproject.org/projects/waitress/en/latest/arguments.html)。`docs/MACOS.md` 的自动化脚本在 Windows 开发环境做过单元与 Caddy 配置解析检查，未在真实 Mac 执行。

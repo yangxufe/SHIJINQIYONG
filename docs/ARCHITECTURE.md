@@ -1,5 +1,15 @@
 # 先吃 v0.2｜网页架构决策
 
+## 2026-10-07 Windows 下载即运行
+
+保留同一 Django 单体；新增原生 PowerShell 引导和 Python 运行控制器，属于本机安装/托管工具，不是微服务。下载 ZIP 可直接双击 Start-Windows.cmd，不依赖 Git/Python/Node 已安装。采用 Python 官方 NuGet 发行包 3.13.16、Caddy 2.11.7及既有精确依赖锁；官方包 URL/散列集中在 config/windows-downloads.json。版本升级需重新核验，不在用户运行时猜测“最新”。
+
+默认按 Windows 用户创建固定 LOCALAPPDATA/ShiJinQiYong 私有目录，源码可更换目录而数据不动。独立 Python/venv、数据、附件、Caddy CA、静态目录彼此分离；初始化生成随机 Django 密钥，只保存一次。源码/依赖指纹改变时迁移前完整备份，重复启动不反复复制所有附件。既有注册表/系统 Python、原 data/runtime.env、服务和任务不接管。SQLite 使用既有 IMMEDIATE/DELETE 配置，官方 Python 3.13.16 的 SQLite 3.50.4 不作为已修复 WAL 运行库，不能启用 WAL。
+
+默认 localhost HTTPS，只绑定 127.0.0.1；初次选择空闲 HTTPS/Waitress 端口并持久保存，已有端口冲突明确失败。LAN 模式每次选择并确认实际私有 IPv4/子网/网卡；限定防火墙规则，运行期间监测地址/网络名称变化。Windows Job 管理本次进程树，PS 互斥锁覆盖安装与运行；默认前台控制台托管，没有添加新的开机任务。CA 使用 skip_install_trust；本机严格健康检查使用正确 CA，浏览器信任另外询问操作者，手机信任仍人工处理。
+
+账号新增 /account/password/ 和 /account/help/；第一个管理员仅本机命令创建，不能从公开页面抢占。其他注册继续原 Django 表单/一次性邀请/短事务；撤销邀请通过到期失效实现，无新表迁移。详情见 WINDOWS.md。
+
 决策日期：2026-09-25。此文给出设计选择与待验证目标，不宣称已经测试或达到“绝对安全”。事实来源见 `SOURCES.md`。
 
 ## 2026-10-06 第四次优化的表单兼容约定

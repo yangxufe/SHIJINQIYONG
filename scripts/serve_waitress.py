@@ -13,7 +13,7 @@ if __name__ == "__main__":
     serve(
         application,
         host="127.0.0.1",
-        port=8000,
+        port=int(os.environ.get("SHIJIN_WAITRESS_PORT", "8000")),
         threads=4,
         trusted_proxy="127.0.0.1",
         trusted_proxy_count=1,

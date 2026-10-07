@@ -1,5 +1,15 @@
 # BVT 构建验证记录
 
+## Windows 自动部署与账号 BVT（2026-10-07）
+
+完整 `manage.py test tests --settings=config.settings.test --noinput` 在原 Python 3.10 通过 140 项（41.044 秒），新下载 Python 3.13.16 通过 140 项（40.292 秒），退出码均 0。新增测试见 tests/test_windows_setup.py（12 项）；无模型迁移差异。新目录安装固定依赖、Caddy、YOLO、SQLite 及静态资源后，check --deploy 仅既有 security.W004。
+
+实际根 cmd 启动经过系统 PowerShell→隔离 Python→Waitress+Caddy，使用新公开 CA 严格核验 localhost HTTPS，并输出 SMOKE_OK 后释放端口。交互首管理员、实例互斥、Ctrl+C 收尾、中文空格源码目录、保留 profile/CA/账号、同版本不重复备份及独立恢复通过；没有改动原局域网服务或系统信任。
+
+真实 HTTPS 15 项账号检查覆盖健康/匿名/CSRF、管理员登录与邀请、普通成员注册/重复邀请码、本人改密、其他旧会话失效、成员权限、no-store、指纹缓存和 POST 退出。测试账号与请求在隔离 profile，脚本 work/windows_install_https_bvt.py 不含真实账号；合成备份恢复后两账号及四个业务页可读。本轮未执行新页面浏览器截图/手机布局、另一台空白 Windows、UAC/系统 CA 导入、缺 VC++ 机器、整机重启或新性能压测。
+
+初始 SQLite 句柄清理、MSI 路径重定向、Set-Acl 权限及 cmd 的 PowerShell 模块继承问题均保留在 PROGRESS 诊断记录，修复后再验证。**本机安装和账号 BVT 通过，不等于 Android 信任或阶段 08 完整发布通过。**
+
 ## 配色增量验证（2026-10-06）
 
 仅共用CSS与本地SVG变化；第二/第四优化已有回归14项通过（1.877秒、退出码0），未重复128项全量。独立合成库浏览器8页×320/390/1280共24组无溢出，另验证时间冲突提示；登录、返回、保质期切换、退出保留。抽查正文/按钮/标签/说明文字最低对比5.10:1，黑字对粉色6.16:1、芝士白14.58:1，placeholder修正后6.46:1；焦点轮廓与箭头间距保持。截图和测量见PROGRESS，不是实机或完整无障碍审计。

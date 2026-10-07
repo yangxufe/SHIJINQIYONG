@@ -11,6 +11,8 @@
   <main class="page">
 {% include 'core/header_actions.html' %}
     <h1>家庭设置</h1>
+    {% for message in messages %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+    <p>当前账号：{{ request.user.username }} · <a href="{% url 'password_change' %}">修改我的密码</a></p>
     {% if household %}<p>{{ household.display_name }} · {{ household.time_zone }}</p>{% endif %}
     <p><a href="{% url 'personal_taste' %}">我的口味配置</a></p>
     {% if request.user.member_role.role == 'admin' %}
@@ -19,6 +21,7 @@
       {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
       <form method="post">{% csrf_token %}<input type="hidden" name="create_invitation" value="yes"><button type="submit">生成家庭邀请码</button></form>
       {% if invitation_token %}<label for="invitation-token">邀请码（24 小时内有效，用后失效）</label><textarea id="invitation-token" rows="4" readonly>{{ invitation_token }}</textarea><p class="small-note">成员在封面的“注册”页面填写此码。</p>{% endif %}
+      {% for invitation in active_invitations %}<div class="panel"><p>{{ invitation.created_by.username }} 创建 · {{ invitation.expires_at|date:'m月d日 H:i' }} 到期</p><form method="post">{% csrf_token %}<button type="submit" name="revoke_invitation" value="{{ invitation.pk }}">撤销此邀请</button></form></div>{% endfor %}
     </section>
     {% else %}<p class="small-note">家庭默认口味及成员邀请由管理员维护。</p>{% endif %}
   </main>

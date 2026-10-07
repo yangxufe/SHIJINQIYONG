@@ -15,7 +15,7 @@
     <form method="post" action="{% url 'login' %}" class="login-form">
       {% csrf_token %}
       <label for="id_username">成员账号</label>
-      <input id="id_username" name="username" type="text" autocomplete="username" maxlength="150" required autofocus>
+      <input id="id_username" name="username" type="text" autocomplete="username" maxlength="150" value="{{ form.username.value|default_if_none:'' }}" required autofocus>
       <label for="id_password">密码</label>
       <div class="password-control">
         <input id="id_password" name="password" type="password" autocomplete="current-password" required>
@@ -25,6 +25,7 @@
       <button type="submit">登录</button>
     </form>
     <p><a href="{% url 'register' %}">注册新账号</a> / <a href="{% url 'welcome' %}">返回首页</a></p>
+    <p class="small-note"><a href="{% url 'account_help' %}">首次使用、忘记密码或账号被锁定？</a></p>
   </main>
 <script type="module" src="{% static 'js/password-peek.js' %}"></script>
 </body>

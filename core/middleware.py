@@ -12,7 +12,7 @@ class AuthenticationGateMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path in {reverse("login"), reverse("health"), reverse("welcome"), reverse("register")}:
+        if request.path in {reverse("login"), reverse("health"), reverse("welcome"), reverse("register"), reverse("account_help")}:
             return self.get_response(request)
         if not request.user.is_authenticated:
             if request.path.startswith("/api/"):

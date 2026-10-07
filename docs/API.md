@@ -1,5 +1,13 @@
 # 食尽其用接口合同（阶段 05 与家庭菜谱扩展）
 
+## 2026-10-07 账号补充
+
+- `GET/POST /account/password/`：已登录家庭成员本人改密，Django PasswordChangeForm 校验原密码及新密码强度，POST 要求 CSRF；成功跳家庭设置，保留当前会话，其他旧会话因密码哈希变化失效。不存在替他人改密的用户 ID 参数。
+- `GET /account/help/`：公开静态帮助，无成员列表、重置令牌或公开找回密码 API；POST 405。
+- `POST /settings/`：原 `create_invitation=yes` 保留；管理员可改传 `revoke_invitation=<UUID>`，仅使未用邀请立即到期。重复撤销安全；普通成员 403；混合/重复字段 422；要求 CSRF。
+- 本机 `setup_household --time-zone <IANA>`：空库交互创建家庭与管理员，已有用户不覆盖；已有用户但无活动管理员时明确拒绝自动初始化，使用原 manage_member 恢复。
+- 无库存/采购/菜谱 API 或数量事务变化，无数据库结构迁移。
+
 同源 HTTPS，所有路径带尾斜杠。请求使用 Django 会话；浏览器写请求必须带 CSRF token。未登录首页跳转 `/welcome/`，其他业务页跳转 `/login/`；`/api/` 未登录返回结构化 401。注册页公开但必须有效管理员邀请，没有无需邀请的公开注册或 Django admin。
 
 ## 已运行
